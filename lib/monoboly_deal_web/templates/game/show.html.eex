@@ -9,3 +9,5 @@
 <% end %>
 
 <div class="hand-container"></div>
+
+<div id="game-root"></div>

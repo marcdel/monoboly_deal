@@ -17,4 +17,12 @@ import "phoenix_html"
 import socket from "./socket"
 import Game from "./game"
 
-Game.init(socket, document.getElementById("game"))
+const gameDiv = document.getElementById("game")
+
+if (gameDiv) {
+  window.GameName = gameDiv.getAttribute("data-name")
+} else {
+  window.GameName = ""
+}
+
+Game.init(socket, gameDiv)

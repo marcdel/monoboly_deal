@@ -18,6 +18,11 @@ config :monoboly_deal, MonobolyDealWeb.Endpoint,
       "development",
       "--watch-stdin",
       cd: Path.expand("../assets", __DIR__)
+    ],
+    node: [
+      "node_modules/bs-platform/lib/bsb",
+      "-w",
+      cd: Path.expand("../assets", __DIR__)
     ]
   ]
 
