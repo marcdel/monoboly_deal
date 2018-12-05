@@ -4,6 +4,11 @@ var Game = require("./Game.bs.js");
 var ReactDOMRe = require("reason-react/src/ReactDOMRe.js");
 var ReasonReact = require("reason-react/src/ReasonReact.js");
 
-ReactDOMRe.renderToElementWithId(ReasonReact.element(undefined, undefined, Game.make(window.GameName, /* array */[])), "game-root");
+var gameName = ( document.getElementById("game") ? document.getElementById("game").getAttribute("data-name") : "" );
 
-/*  Not a pure module */
+if (gameName !== "") {
+  ReactDOMRe.renderToElementWithId(ReasonReact.element(undefined, undefined, Game.make(gameName, window.userToken, /* array */[])), "game");
+}
+
+exports.gameName = gameName;
+/* gameName Not a pure module */
