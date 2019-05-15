@@ -4,20 +4,18 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>MonobolyDeal · Phoenix Framework</title>
+    <title>Monoboly Deal</title>
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
   </head>
   <body>
-    <header>
+    <header role="banner">
       <section class="container">
+        <h1><%= link "Monoboly Deal", to: Routes.page_path(@conn, :index), class: "logo" %></h1>
         <nav role="navigation">
-          <ul>
-            <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
-          </ul>
+           <ul>
+              <li><%= link "Change User", to: Routes.page_path(@conn, :index) %></li>
+           </ul>
         </nav>
-        <a href="http://phoenixframework.org/" class="phx-logo">
-          <img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>
-        </a>
       </section>
     </header>
     <main role="main" class="container">
