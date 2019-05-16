@@ -23,6 +23,11 @@ defmodule MonobolyDealWeb.ConnCase do
 
       # The default endpoint for testing
       @endpoint MonobolyDealWeb.Endpoint
+
+      def create_session(conn, name) do
+        params = %{"name" => name}
+        post(conn, Routes.session_path(conn, :create), %{"player" => params})
+      end
     end
   end
 

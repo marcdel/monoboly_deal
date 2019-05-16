@@ -1,0 +1,16 @@
+<section class="row">
+  <article class="column">
+    <h2>Welcome!</h2>
+    <p>We need your name to get started:</p>
+  </article>
+</section>
+<section class="row">
+  <article class="column">
+    <%= form_for @conn, Routes.session_path(@conn, :create), [as: :player], fn f -> %>
+      <%= text_input f, :name, placeholder: "Name", autofocus: true, required: true %>
+      <%= submit "Play!", class: "button" %>
+    <% end %>
+  </article>
+  <article class="column">
+  </article>
+</section>
