@@ -1,5 +1,7 @@
 defmodule MonobolyDealWeb.Auth do
   import Plug.Conn
+  import Phoenix.Controller
+  alias MonobolyDealWeb.Router.Helpers, as: Routes
 
   def login(conn, player) do
     conn
@@ -14,5 +16,19 @@ defmodule MonobolyDealWeb.Auth do
     conn
     |> assign(:current_player, player)
     |> assign(:user_token, token)
+  end
+
+  def authenticate_user(conn) do
+    case get_session(conn, :current_player) do
+      nil ->
+        conn
+        |> put_session(:return_to, conn.request_path)
+        |> redirect(to: Routes.session_path(conn, :new))
+        |> halt()
+
+      player ->
+        conn
+        |> put_current_player(player)
+    end
   end
 end

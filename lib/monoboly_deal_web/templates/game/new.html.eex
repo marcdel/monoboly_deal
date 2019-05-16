@@ -1,0 +1,2 @@
+<h2>Start a new game</h2>
+<%= button("Start", to: Routes.game_path(@conn, :create), method: :post, class: "button") %>

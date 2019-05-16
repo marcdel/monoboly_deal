@@ -1,5 +1,5 @@
 defmodule MonobolyDealWeb.PageControllerTest do
-  use MonobolyDealWeb.ConnCase
+  use MonobolyDealWeb.ConnCase, async: true
 
   test "GET /", %{conn: conn} do
     conn = get(conn, "/")

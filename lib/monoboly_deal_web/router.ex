@@ -20,6 +20,7 @@ defmodule MonobolyDealWeb.Router do
     # don't take an id parameter for delete
     delete "/sessions", SessionController, :delete
     resources "/sessions", SessionController, only: [:new, :create]
+    resources "/games", GameController, only: [:new, :create, :show]
   end
 
   # Other scopes may use custom stacks.
