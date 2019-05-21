@@ -2,13 +2,14 @@ defmodule MonobolyDealWeb.SessionController do
   use MonobolyDealWeb, :controller
 
   alias MonobolyDealWeb.Auth
+  alias MonobolyDeal.Game.Player
 
   def new(conn, _params) do
     render(conn, "new.html")
   end
 
   def create(conn, %{"player" => %{"name" => name}}) do
-    player = %{name: name}
+    player = %Player{name: name}
 
     conn
     |> Auth.login(player)

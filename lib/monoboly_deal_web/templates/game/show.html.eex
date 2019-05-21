@@ -1,1 +1,1 @@
-<h2><%= @game_name %></h2>
+<h2><%= @game_name %> - <%= inspect(@pid) %></h2>

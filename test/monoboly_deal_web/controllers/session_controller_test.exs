@@ -13,8 +13,8 @@ defmodule MonobolyDealWeb.SessionControllerTest do
       attrs = %{"name" => "player1"}
       conn = post(conn, Routes.session_path(conn, :create), player: attrs)
 
-      assert get_session(conn, :current_player) == %{name: "player1"}
-      # assert redirected_to(conn) == Routes.game_path(conn, :new)
+      assert %{name: "player1"} = get_session(conn, :current_player)
+      assert redirected_to(conn) == Routes.game_path(conn, :new)
     end
 
     test "redirects to the previous page if return_to is set", %{conn: conn} do
