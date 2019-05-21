@@ -1,5 +1,5 @@
 defmodule MonobolyDeal.Game do
-  defstruct [:name, :players, :discard_pile, :deck, :started]
+  defstruct [:name, :players, :hands, :discard_pile, :deck, :started]
 
   alias MonobolyDeal.Deck
   alias MonobolyDeal.Game
@@ -8,6 +8,7 @@ defmodule MonobolyDeal.Game do
     %Game{
       name: name,
       players: [player],
+      hands: %{player.name => []},
       discard_pile: [],
       deck: Deck.shuffle(),
       started: false
@@ -23,8 +24,12 @@ defmodule MonobolyDeal.Game do
 
   def join(game, player) do
     case playing?(game, player) do
-      false -> {:ok, %{game | players: game.players ++ [player]}}
-      true -> {:ok, game}
+      false ->
+        {:ok,
+         %{game | players: game.players ++ [player], hands: Map.put(game.hands, player.name, [])}}
+
+      true ->
+        {:ok, game}
     end
   end
 
@@ -33,19 +38,19 @@ defmodule MonobolyDeal.Game do
   end
 
   def deal(game) do
-    {players, deck} =
-      Enum.map_reduce(
+    game =
+      Enum.reduce(
         game.players,
-        game.deck,
-        fn player, deck ->
-          {hand, updated_deck} = Enum.split(deck, 5)
-          updated_player = %{player | hand: hand}
+        game,
+        fn player, game ->
+          {hand, updated_deck} = Enum.split(game.deck, 5)
+          updated_hands = %{game.hands | player.name => hand}
 
-          {updated_player, updated_deck}
+          %{game | hands: updated_hands, started: true}
         end
       )
 
-    %{game | players: players, deck: deck, started: true}
+    %{game | started: true}
   end
 
   def game_state(game) do
@@ -67,13 +72,12 @@ defmodule MonobolyDeal.Game do
 
     %{
       name: found_player.name,
-      hand: found_player.hand
+      hand: get_hand(game, found_player)
     }
   end
 
   def get_hand(game, player) do
-    found_player = find_player(game, player)
-    found_player.hand
+    Map.fetch!(game.hands, player.name)
   end
 
   defp find_player(game, player) do

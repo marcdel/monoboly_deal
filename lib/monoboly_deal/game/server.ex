@@ -87,7 +87,9 @@ defmodule MonobolyDeal.Game.Server do
     Enum.each(
       game.players,
       fn player ->
-        Endpoint.broadcast!("players:" <> player.name, "player_hand", %{hand: player.hand})
+        Endpoint.broadcast!("players:" <> player.name, "player_hand", %{
+          hand: Game.get_hand(game, player)
+        })
       end
     )
   end

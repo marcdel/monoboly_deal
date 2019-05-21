@@ -27,6 +27,15 @@ defmodule MonobolyDeal.GameTest do
       assert game.deck -- Deck.cards() == []
       refute game.deck == Deck.cards()
     end
+
+    test "starts with empty hands" do
+      game_name = NameGenerator.generate()
+      player = %{name: "player1"}
+
+      game = Game.new(game_name, player)
+
+      assert game.hands == %{"player1" => []}
+    end
   end
 
   describe "join/2" do
@@ -110,13 +119,8 @@ defmodule MonobolyDeal.GameTest do
 
     test "each player is dealt a hand of 5 cards", %{game: game} do
       game = Game.deal(game)
-
-      Enum.each(
-        game.players,
-        fn player ->
-          assert Enum.count(player.hand) == 5
-        end
-      )
+      assert Enum.count(game.hands["player1"]) == 5
+      assert Enum.count(game.hands["player2"]) == 5
     end
   end
 
