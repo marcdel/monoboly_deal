@@ -122,6 +122,12 @@ defmodule MonobolyDeal.GameTest do
       assert Enum.count(game.hands["player1"]) == 5
       assert Enum.count(game.hands["player2"]) == 5
     end
+
+    test "dealt cards are removed from the deck", %{game: game} do
+      assert Enum.count(game.deck) == 106
+      game = Game.deal(game)
+      assert Enum.count(game.deck) == 96
+    end
   end
 
   describe "getting the game state" do

@@ -19,7 +19,7 @@ defmodule MonobolyDeal.Deck do
     |> add_rent_cards()
     |> add_property_cards()
     |> add_dual_property_cards()
-    |> Kernel.++(for _ <- 1..2, do: WildProperty.new())
+    |> add_wild_property_cards()
   end
 
   defp add_money_cards(cards) do
@@ -135,5 +135,10 @@ defmodule MonobolyDeal.Deck do
               Property.new(3, :yellow, [2, 4, 6])
             )
     )
+  end
+
+  defp add_wild_property_cards(cards) do
+    cards
+    |> Kernel.++(for _ <- 1..2, do: WildProperty.new())
   end
 end

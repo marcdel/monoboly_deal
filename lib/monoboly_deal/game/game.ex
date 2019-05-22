@@ -46,7 +46,7 @@ defmodule MonobolyDeal.Game do
           {hand, updated_deck} = Enum.split(game.deck, 5)
           updated_hands = %{game.hands | player.name => hand}
 
-          %{game | hands: updated_hands, started: true}
+          %{game | hands: updated_hands, deck: updated_deck, started: true}
         end
       )
 
