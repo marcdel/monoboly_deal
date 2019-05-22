@@ -61,7 +61,8 @@ config :monoboly_deal, MonobolyDealWeb.Endpoint,
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/monoboly_deal_web/{live,views}/.*(ex)$",
-      ~r"lib/monoboly_deal_web/templates/.*(eex)$"
+      ~r"lib/monoboly_deal_web/templates/.*(eex)$",
+      ~r{lib/crowd_review_web/live/.*(ex)$}
     ]
   ]
 

@@ -55,6 +55,12 @@ defmodule MonobolyDeal.Game.Server do
     {:ok, game, @timeout}
   end
 
+  def handle_cast(:deal_hand, game) do
+    updated_game = Game.deal(game)
+    broadcast_hands(updated_game)
+    {:noreply, updated_game, @timeout}
+  end
+
   def handle_call({:join, player}, _from, game) do
     case Game.join(game, player) do
       {:ok, updated_game} ->
@@ -63,12 +69,6 @@ defmodule MonobolyDeal.Game.Server do
       {:error, error} ->
         {:reply, {:error, error}, game, @timeout}
     end
-  end
-
-  def handle_cast(:deal_hand, game) do
-    updated_game = Game.deal(game)
-    broadcast_hands(updated_game)
-    {:noreply, updated_game, @timeout}
   end
 
   def handle_call(:game_state, _from, game) do

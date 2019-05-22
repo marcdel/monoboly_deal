@@ -62,4 +62,17 @@ config :logger, level: :info
 
 # Finally import the config/prod.secret.exs which loads secrets
 # and configuration from environment variables.
-import_config "prod.secret.exs"
+# import_config "prod.secret.exs"
+
+secret_key_base = System.get_env("SECRET_KEY_BASE") || raise "SECRET_KEY_BASE must be set"
+
+config :crowd_review_web,
+       CrowdReviewWeb.Endpoint,
+       secret_key_base: secret_key_base
+
+live_view_salt = System.get_env("LIVE_VIEW_SALT") || raise "LIVE_VIEW_SALT must be set"
+
+config :crowd_review, CrowdReviewWeb.Endpoint, live_view: [signing_salt: live_view_salt]
+
+database_url = System.get_env("DATABASE_URL") || raise "DATABASE_URL must be set"
+pool_size = System.get_env("POOL_SIZE") || "1"
