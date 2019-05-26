@@ -3,6 +3,6 @@ defmodule MonobolyDealWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get(conn, "/")
-    assert html_response(conn, 200) =~ "Monoboly Deal"
+    assert redirected_to(conn) == Routes.session_path(conn, :new)
   end
 end

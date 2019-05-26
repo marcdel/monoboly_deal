@@ -1,6 +1,7 @@
 defmodule MonobolyDealWeb.GameController do
   use MonobolyDealWeb, :controller
 
+  alias Phoenix.LiveView
   alias MonobolyDeal.Game.{NameGenerator, Server, Supervisor}
   alias MonobolyDealWeb.Auth
 
@@ -28,10 +29,15 @@ defmodule MonobolyDealWeb.GameController do
   def show(conn, %{"id" => game_name}) do
     case Server.game_pid(game_name) do
       pid when is_pid(pid) ->
-        conn
-        |> assign(:game_name, game_name)
-        |> assign(:pid, pid)
-        |> render("show.html")
+        LiveView.Controller.live_render(
+          conn,
+          MonobolyDealWeb.InProgressGameView,
+          session: %{
+            game_name: game_name,
+            current_player: get_session(conn, :current_player),
+            pid: pid
+          }
+        )
 
       nil ->
         conn

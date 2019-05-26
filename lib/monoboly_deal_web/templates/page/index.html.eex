@@ -1,7 +1,0 @@
-<section class="hand">
-  <img src="<%= Routes.static_path(@conn, "/images/cards/birthday.png") %>" class="card" alt="birthday"/>
-  <img src="<%= Routes.static_path(@conn, "/images/cards/deal-breaker.png") %>" class="card" alt="deal-breaker"/>
-  <img src="<%= Routes.static_path(@conn, "/images/cards/debt-collector.png") %>" class="card" alt="debt-collector"/>
-  <img src="<%= Routes.static_path(@conn, "/images/cards/forced-deal.png") %>" class="card" alt="forced-deal"/>
-  <img src="<%= Routes.static_path(@conn, "/images/cards/hotel.png") %>" class="card" alt="hotel"/>
-</section>

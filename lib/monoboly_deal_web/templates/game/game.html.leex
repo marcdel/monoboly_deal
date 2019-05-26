@@ -1,0 +1,18 @@
+<main role="main" class="game-page">
+  <section class="game-container">
+    <h2><%= @game_name %></h2>
+    <%= if @game_state.started do %>
+      <%= render "game_state.html",
+        assigns
+        |> Map.put(:game_state, @game_state)
+        |> Map.put(:player_state, @player_state)
+      %>
+    <% else %>
+      <button phx-click="deal-hand" class="button">Deal</button>
+    <% end %>
+  </section>
+
+  <section class="players-container">
+    <%= render "players.html", Map.put(assigns, :current_player, @current_player) %>
+  </section>
+</main>

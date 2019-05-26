@@ -1,0 +1,5 @@
+<p class="hand">
+  <%= Enum.map(@player_state.hand, fn card -> %>
+    <img src="<%= card.image_url %>" class="card" alt="<%= card.name %>" />
+  <% end) %>
+</p>

@@ -86,6 +86,23 @@ a:focus, a:hover {
   filter: brightness(90%);
 }
 
+div.phx-connected {
+  /* uhg, framework adding markup 😠 */
+  width: 100%;
+}
+
+main.game-page {
+  display: flex;
+}
+
+.game-container {
+  width: 80%;
+}
+
+.players-container {
+  width: 20%;
+}
+
 .hand {
   /*margin-left: 50rem;*/
 }
