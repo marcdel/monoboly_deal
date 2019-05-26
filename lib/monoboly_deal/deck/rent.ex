@@ -7,28 +7,38 @@ defmodule MonobolyDeal.Deck.Rent do
     %Rent{name: :rent_card, value: 1, colors: colors, image_url: get_image_url(colors)}
   end
 
-  defp get_image_url(colors) do
-    case colors do
-      [:blue, :green] ->
-        "/images/cards/rent-blue-or-green.png"
+  defp get_image_url([:blue, :green]) do
+    "/images/cards/rent-blue-or-green.png"
+  end
 
-      [:red, :yellow] ->
-        "/images/cards/rent-red-or-yellow.png"
+  defp get_image_url([:red, :yellow]) do
+    "/images/cards/rent-red-or-yellow.png"
+  end
 
-      [:pink, :orange] ->
-        "/images/cards/rent-orange-or-pink.png"
+  defp get_image_url([:pink, :orange]) do
+    "/images/cards/rent-orange-or-pink.png"
+  end
 
-      [:light_blue, :brown] ->
-        "/images/cards/rent-light-blue-or-brown.png"
+  defp get_image_url([:light_blue, :brown]) do
+    "/images/cards/rent-light-blue-or-brown.png"
+  end
 
-      [:railroad, :utility] ->
-        "/images/cards/rent-black-or-light-green.png"
+  defp get_image_url([:railroad, :utility]) do
+    "/images/cards/rent-black-or-light-green.png"
+  end
 
-      [:blue, :green, :red, :yellow, :pink, :orange, :light_blue, :brown, :railroad, :utility] ->
-        "/images/cards/rent-all-colour.png"
-
-      _ ->
-        raise ArgumentError, "#{inspect(colors)} is not a valid property rent card."
-    end
+  defp get_image_url([
+         :blue,
+         :green,
+         :red,
+         :yellow,
+         :pink,
+         :orange,
+         :light_blue,
+         :brown,
+         :railroad,
+         :utility
+       ]) do
+    "/images/cards/rent-all-colour.png"
   end
 end

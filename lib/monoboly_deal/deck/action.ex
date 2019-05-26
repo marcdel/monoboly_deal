@@ -7,19 +7,14 @@ defmodule MonobolyDeal.Deck.Action do
     %Action{name: :action_card, value: value, type: type, image_url: get_image_url(type)}
   end
 
-  defp get_image_url(type) do
-    case type do
-      :deal_breaker -> "/images/cards/deal-breaker.png"
-      :just_say_no -> "/images/cards/say-no.png"
-      :pass_go -> "/images/cards/pass-go.png"
-      :forced_deal -> "/images/cards/forced-deal.png"
-      :sly_deal -> "/images/cards/sly-deal.png"
-      :debt_collector -> "/images/cards/debt-collector.png"
-      :its_my_birthday -> "/images/cards/birthday.png"
-      :double_the_rent -> "/images/cards/double-rent.png"
-      :house -> "/images/cards/house.png"
-      :hotel -> "/images/cards/hotel.png"
-      _ -> raise ArgumentError, "The type '#{type}' is not a valid action card type."
-    end
-  end
+  defp get_image_url(:deal_breaker), do: "/images/cards/deal-breaker.png"
+  defp get_image_url(:just_say_no), do: "/images/cards/say-no.png"
+  defp get_image_url(:pass_go), do: "/images/cards/pass-go.png"
+  defp get_image_url(:forced_deal), do: "/images/cards/forced-deal.png"
+  defp get_image_url(:sly_deal), do: "/images/cards/sly-deal.png"
+  defp get_image_url(:debt_collector), do: "/images/cards/debt-collector.png"
+  defp get_image_url(:its_my_birthday), do: "/images/cards/birthday.png"
+  defp get_image_url(:double_the_rent), do: "/images/cards/double-rent.png"
+  defp get_image_url(:house), do: "/images/cards/house.png"
+  defp get_image_url(:hotel), do: "/images/cards/hotel.png"
 end

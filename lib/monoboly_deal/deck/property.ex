@@ -13,19 +13,14 @@ defmodule MonobolyDeal.Deck.Property do
     }
   end
 
-  defp get_image_url(color) do
-    case color do
-      :blue -> "/images/cards/property-blue.png"
-      :brown -> "/images/cards/property-brown.png"
-      :utility -> "/images/cards/property-light-green.png"
-      :green -> "/images/cards/property-green.png"
-      :yellow -> "/images/cards/property-yellow.png"
-      :red -> "/images/cards/property-red.png"
-      :orange -> "/images/cards/property-orange.png"
-      :pink -> "/images/cards/property-pink.png"
-      :light_blue -> "/images/cards/property-light-blue.png"
-      :railroad -> "/images/cards/property-black.png"
-      _ -> raise ArgumentError, "#{inspect(color)} is not a valid property dual property card."
-    end
-  end
+  defp get_image_url(:blue), do: "/images/cards/property-blue.png"
+  defp get_image_url(:brown), do: "/images/cards/property-brown.png"
+  defp get_image_url(:utility), do: "/images/cards/property-light-green.png"
+  defp get_image_url(:green), do: "/images/cards/property-green.png"
+  defp get_image_url(:yellow), do: "/images/cards/property-yellow.png"
+  defp get_image_url(:red), do: "/images/cards/property-red.png"
+  defp get_image_url(:orange), do: "/images/cards/property-orange.png"
+  defp get_image_url(:pink), do: "/images/cards/property-pink.png"
+  defp get_image_url(:light_blue), do: "/images/cards/property-light-blue.png"
+  defp get_image_url(:railroad), do: "/images/cards/property-black.png"
 end
