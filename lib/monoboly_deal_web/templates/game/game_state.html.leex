@@ -1,5 +1,19 @@
-<p class="hand">
+<section class="opponents-played-cards">
+  <h4>Opponent's Played Cards</h4>
+</section>
+
+<section class="draw-pile">
+  <h4>Draw Pile</h4>
+  <img src="/images/cards/back.png" class="card" alt="back of card" />
+</section>
+
+<section class="players-played-cards">
+  <h4>Your Played Cards</h4>
+</section>
+
+<section class="hand">
+  <h4>Your Hand</h4>
   <%= Enum.map(@player_state.hand, fn card -> %>
     <img src="<%= card.image_url %>" class="card" alt="<%= card.name %>" />
   <% end) %>
-</p>
+</section>

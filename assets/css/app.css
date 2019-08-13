@@ -103,12 +103,8 @@ main.game-page {
   width: 20%;
 }
 
-.hand {
-  /*margin-left: 50rem;*/
-}
-
-.hand .card {
-  /*margin-left: -27rem;*/
+section > h4 {
+  border-bottom: 1px solid #000;
 }
 
 .card {
