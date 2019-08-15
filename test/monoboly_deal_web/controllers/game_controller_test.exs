@@ -33,6 +33,19 @@ defmodule MonobolyDealWeb.GameControllerTest do
     end
   end
 
+  describe "join game" do
+    test "joins an existing game and redirects to show the game", %{conn: conn} do
+      player1_conn = create_session(conn, "player1")
+      player1_conn = post(player1_conn, Routes.game_path(player1_conn, :create))
+      assert %{id: game_name} = redirected_params(player1_conn)
+
+      player2_conn = create_session(conn, "player2")
+      player2_conn = get(player2_conn, Routes.game_path(player2_conn, :show, game_name))
+
+      assert html_response(player2_conn, 200) =~ game_name
+    end
+  end
+
   describe "show game" do
     test "redirects to new session page if not authenticated", %{conn: conn} do
       conn = get(conn, Routes.game_path(conn, :show, "new_game_path"))

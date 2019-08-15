@@ -13,6 +13,11 @@
   </section>
 
   <section class="players-container">
-    <%= render "players.html", Map.put(assigns, :current_player, @current_player) %>
+    <h3>Players</h3>
+    <ul>
+      <%= for player <- @game_state.players do %>
+        <li><%= player.name %></li>
+      <% end %>
+    </ul>
   </section>
 </main>

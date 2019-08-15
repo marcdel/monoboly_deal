@@ -153,6 +153,14 @@ defmodule MonobolyDeal.GameTest do
       assert player_state.name == "player2"
       assert Enum.count(player_state.hand) == 5
     end
+
+    test "returns nil for unknown player" do
+      player_state =
+        create_started_game()
+        |> Game.player_state(%{name: "player3"})
+
+      assert player_state == nil
+    end
   end
 
   describe "getting a players hand" do

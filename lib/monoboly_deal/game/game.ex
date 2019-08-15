@@ -68,19 +68,25 @@ defmodule MonobolyDeal.Game do
   end
 
   def player_state(game, player) do
-    found_player = find_player(game, player)
-
-    %{
-      name: found_player.name,
-      hand: get_hand(game, found_player)
-    }
+    game
+    |> find_player(player)
+    |> build_player_state(game)
   end
 
   def get_hand(game, player) do
     Map.fetch!(game.hands, player.name)
   end
 
-  defp find_player(game, player) do
+  def find_player(game, player) do
     Enum.find(game.players, fn p -> p.name == player.name end)
+  end
+
+  defp build_player_state(nil, game), do: nil
+
+  defp build_player_state(player, game) do
+    %{
+      name: player.name,
+      hand: get_hand(game, player)
+    }
   end
 end

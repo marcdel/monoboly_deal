@@ -25,24 +25,14 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
       assert html =~ player.name
       assert html =~ "Deal"
     end
-  end
 
-  describe "deal-hand" do
-    test "deals a hand and rdisplays the player's cards", %{
-      game_name: game_name,
-      player: player
-    } do
-      session = %{game_name: game_name, current_player: player}
-      {:ok, view, _html} = mount(Endpoint, InProgressGameView, session: session)
-
-      html_after_click = render_click(view, "deal-hand")
-
-      player_state = Server.player_state(game_name, player)
-
-      Enum.each(player_state.hand, fn card ->
-        assert html_after_click =~ Atom.to_string(card.name)
-        assert html_after_click =~ card.image_url
-      end)
+    test "joins the game if not already playing", %{game_name: game_name, player: player1} do
+      player2 = %{name: "player2"}
+      player2_session = %{game_name: game_name, current_player: player2}
+      {:ok, _view, html} = mount(Endpoint, InProgressGameView, session: player2_session)
+      assert html =~ game_name
+      assert html =~ player1.name
+      assert html =~ player2.name
     end
   end
 end

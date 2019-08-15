@@ -76,6 +76,25 @@ defmodule MonobolyDeal.Game.ServerTest do
     end
   end
 
+  describe "playing?" do
+    test "returns true when player found" do
+      game_name = NameGenerator.generate()
+      player = %Player{name: "player1"}
+      {:ok, _pid} = Server.start_link(game_name, player)
+
+      assert Server.playing?(game_name, player) == {:ok, true}
+    end
+
+    test "returns false when player not found" do
+      game_name = NameGenerator.generate()
+      player1 = %Player{name: "player1"}
+      player2 = %Player{name: "player2"}
+      {:ok, _pid} = Server.start_link(game_name, player1)
+
+      assert Server.playing?(game_name, player2) == {:ok, false}
+    end
+  end
+
   describe "deal_hand" do
     test "deals a hand to each player and returns the updated game" do
       game_name = NameGenerator.generate()
