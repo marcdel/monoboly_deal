@@ -128,6 +128,16 @@ defmodule MonobolyDeal.GameTest do
       game = Game.deal(game)
       assert Enum.count(game.deck) == 96
     end
+
+    test "chooses a player to have the first turn", %{game: game, player1: player1, player2: player2} do
+      game = Game.deal(game)
+      %{whose_turn: whose_turn} = Game.game_state(game)
+      case whose_turn do
+        ^player1 -> assert Game.player_state(game, player1).my_turn == true
+        ^player2 -> assert Game.player_state(game, player2).my_turn == true
+        _ -> flunk("Expected whose_turn to be player1 or player2, but was #{whose_turn}")
+      end
+    end
   end
 
   describe "getting the game state" do

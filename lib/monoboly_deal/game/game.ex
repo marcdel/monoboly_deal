@@ -1,5 +1,5 @@
 defmodule MonobolyDeal.Game do
-  defstruct [:name, :players, :hands, :discard_pile, :deck, :started]
+  defstruct [:name, :players, :hands, :discard_pile, :deck, :started, :whose_turn]
 
   alias MonobolyDeal.Deck
   alias MonobolyDeal.Game
@@ -11,7 +11,8 @@ defmodule MonobolyDeal.Game do
       hands: %{player.name => []},
       discard_pile: [],
       deck: Deck.shuffle(),
-      started: false
+      started: false,
+      whose_turn: nil
     }
   end
 
@@ -50,7 +51,7 @@ defmodule MonobolyDeal.Game do
         end
       )
 
-    %{game | started: true}
+    %{game | started: true, whose_turn: Enum.random(game.players)}
   end
 
   def game_state(game) do
@@ -63,7 +64,8 @@ defmodule MonobolyDeal.Game do
             %{name: player.name}
           end
         ),
-      started: game.started
+      started: game.started,
+      whose_turn: game.whose_turn
     }
   end
 
@@ -81,12 +83,13 @@ defmodule MonobolyDeal.Game do
     Enum.find(game.players, fn p -> p.name == player.name end)
   end
 
-  defp build_player_state(nil, game), do: nil
+  defp build_player_state(nil, _), do: nil
 
   defp build_player_state(player, game) do
     %{
       name: player.name,
-      hand: get_hand(game, player)
+      hand: get_hand(game, player),
+      my_turn: game.whose_turn == player
     }
   end
 end
