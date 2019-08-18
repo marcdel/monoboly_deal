@@ -38,17 +38,24 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
     test "redirects if not joined and game has already started", %{game_name: game_name} do
       Server.deal_hand(game_name)
       player2_session = %{game_name: game_name, current_player: %{name: "player2"}}
-      {:error, %{redirect: "/games/new"}} = mount(Endpoint, InProgressGameView, session: player2_session)
+
+      {:error, %{redirect: "/games/new"}} =
+        mount(Endpoint, InProgressGameView, session: player2_session)
     end
   end
 
   describe "deal-hand" do
-    test "deals a hand to each player and updates player and game state", %{game_name: game_name, player: player1} do
+    test "deals a hand to each player and updates player and game state", %{
+      game_name: game_name,
+      player: player1
+    } do
       player2 = %{name: "player2"}
       player2_session = %{game_name: game_name, current_player: player2}
       {:ok, view, _html} = mount(Endpoint, InProgressGameView, session: player2_session)
 
-      assert render_click(view, "deal-hand") =~ "<section class=\"hand\">"
+      html = render_click(view, "deal-hand")
+      assert html =~ "<section class=\"hand\">"
+      assert html =~ "Your turn!" || "player1's turn!"
 
       player1_session = %{game_name: game_name, current_player: player1}
       {:ok, _view, html} = mount(Endpoint, InProgressGameView, session: player1_session)

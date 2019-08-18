@@ -9,7 +9,7 @@ defmodule MonobolyDealWeb.InProgressGameView do
   end
 
   def mount(%{game_name: game_name, current_player: current_player}, socket) do
-    if connected?(socket), do: :timer.send_interval(1000, self(), :tick)
+    if connected?(socket), do: :timer.send_interval(100, self(), :tick)
 
     case Server.join(game_name, current_player) do
       {:ok, _} ->
@@ -24,13 +24,8 @@ defmodule MonobolyDealWeb.InProgressGameView do
 
         {:ok, socket}
 
-      {:error, error_message} ->
-        {
-          :stop,
-          socket
-           |> put_flash(:error, error_message) # Todo: flash message isn't shown after the redirect
-           |> redirect(to: Routes.game_path(socket, :new))
-        }
+      {:error, _error_message} ->
+        {:stop, redirect(socket, to: Routes.game_path(socket, :new))}
     end
   end
 
@@ -38,15 +33,37 @@ defmodule MonobolyDealWeb.InProgressGameView do
     Server.deal_hand(socket.assigns.game_name)
     player_state = Server.player_state(socket.assigns.game_name, socket.assigns.current_player)
     game_state = Server.game_state(socket.assigns.game_name)
-    {:noreply, assign(socket, player_state: player_state, game_state: game_state)}
+
+    socket =
+      socket
+      |> assign(player_state: player_state, game_state: game_state)
+
+    {:noreply, socket}
   end
 
   def handle_info(:tick, socket) do
-    socket = assign(socket,
-        player_state: Server.player_state(socket.assigns.game_name, socket.assigns.current_player),
-        game_state: Server.game_state(socket.assigns.game_name)
-      )
+    game_state = Server.game_state(socket.assigns.game_name)
+    player_state = Server.player_state(socket.assigns.game_name, socket.assigns.current_player)
+
+    socket =
+      socket
+      |> assign(player_state: player_state, game_state: game_state)
+      |> set_player_turn_message(player_state, game_state)
 
     {:noreply, socket}
+  end
+
+  defp set_player_turn_message(socket, _, %{whose_turn: nil}), do: socket
+
+  defp set_player_turn_message(socket, %{my_turn: true}, _) do
+    socket
+    |> assign(error_message: "")
+    |> assign(info_message: "Your turn!")
+  end
+
+  defp set_player_turn_message(socket, %{my_turn: false}, %{whose_turn: whose_turn}) do
+    socket
+    |> assign(error_message: "")
+    |> assign(info_message: "#{whose_turn.name}'s turn!")
   end
 end
