@@ -1,8 +1,17 @@
 defmodule MonobolyDeal.Game do
-  defstruct [:name, :players, :hands, :discard_pile, :deck, :started, :whose_turn]
+  defstruct [
+    :name,
+    :players,
+    :hands,
+    :discard_pile,
+    :deck,
+    :started,
+    :current_turn
+  ]
 
   alias MonobolyDeal.Deck
   alias MonobolyDeal.Game
+  alias MonobolyDeal.Game.Turn
 
   def new(name, player) do
     %Game{
@@ -12,7 +21,7 @@ defmodule MonobolyDeal.Game do
       discard_pile: [],
       deck: Deck.shuffle(),
       started: false,
-      whose_turn: nil
+      current_turn: nil
     }
   end
 
@@ -34,6 +43,24 @@ defmodule MonobolyDeal.Game do
     end
   end
 
+  def draw_cards(
+        %{current_turn: %{player: %{name: name}, drawn_cards: []}} = game,
+        %{name: name} = player
+      ) do
+    {cards, updated_deck} = Enum.split(game.deck, 2)
+    player_hand = get_hand(game, player)
+    updated_hands = %{game.hands | player.name => player_hand ++ cards}
+
+    %{
+      game
+      | hands: updated_hands,
+        deck: updated_deck,
+        current_turn: %{game.current_turn | drawn_cards: cards}
+    }
+  end
+
+  def draw_cards(game, _), do: game
+
   defp playing?(game, player) do
     Enum.any?(game.players, fn p -> p.name == player.name end)
   end
@@ -51,7 +78,7 @@ defmodule MonobolyDeal.Game do
         end
       )
 
-    %{game | started: true, whose_turn: Enum.random(game.players)}
+    %{game | started: true, current_turn: Turn.new(Enum.random(game.players))}
   end
 
   def game_state(game) do
@@ -65,7 +92,7 @@ defmodule MonobolyDeal.Game do
           end
         ),
       started: game.started,
-      whose_turn: game.whose_turn
+      current_turn: game.current_turn
     }
   end
 
@@ -85,11 +112,19 @@ defmodule MonobolyDeal.Game do
 
   defp build_player_state(nil, _), do: nil
 
+  defp build_player_state(player, %{current_turn: nil} = game) do
+    %{
+      name: player.name,
+      hand: get_hand(game, player),
+      my_turn: false
+    }
+  end
+
   defp build_player_state(player, game) do
     %{
       name: player.name,
       hand: get_hand(game, player),
-      my_turn: game.whose_turn == player
+      my_turn: game.current_turn.player == player
     }
   end
 end

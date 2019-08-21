@@ -30,13 +30,26 @@ defmodule MonobolyDealWeb.InProgressGameView do
   end
 
   def handle_event("deal-hand", _value, socket) do
-    Server.deal_hand(socket.assigns.game_name)
-    player_state = Server.player_state(socket.assigns.game_name, socket.assigns.current_player)
-    game_state = Server.game_state(socket.assigns.game_name)
+    %{game_name: game_name, current_player: current_player} = socket.assigns
 
-    socket =
-      socket
-      |> assign(player_state: player_state, game_state: game_state)
+    Server.deal_hand(game_name)
+    player_state = Server.player_state(game_name, current_player)
+    game_state = Server.game_state(game_name)
+
+    socket = assign(socket, player_state: player_state, game_state: game_state)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("draw-cards", _value, socket) do
+    %{game_name: game_name, current_player: current_player} = socket.assigns
+
+    Server.draw_cards(game_name, current_player)
+
+    player_state = Server.player_state(game_name, current_player)
+    game_state = Server.game_state(game_name)
+
+    socket = assign(socket, player_state: player_state, game_state: game_state)
 
     {:noreply, socket}
   end
@@ -53,7 +66,7 @@ defmodule MonobolyDealWeb.InProgressGameView do
     {:noreply, socket}
   end
 
-  defp set_player_turn_message(socket, _, %{whose_turn: nil}), do: socket
+  defp set_player_turn_message(socket, _, %{current_turn: nil}), do: socket
 
   defp set_player_turn_message(socket, %{my_turn: true}, _) do
     socket
@@ -61,7 +74,7 @@ defmodule MonobolyDealWeb.InProgressGameView do
     |> assign(info_message: "Your turn!")
   end
 
-  defp set_player_turn_message(socket, %{my_turn: false}, %{whose_turn: whose_turn}) do
+  defp set_player_turn_message(socket, %{my_turn: false}, %{currrent_turn: %{player: whose_turn}}) do
     socket
     |> assign(error_message: "")
     |> assign(info_message: "#{whose_turn.name}'s turn!")

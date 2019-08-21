@@ -4,7 +4,7 @@
 
 <section class="draw-pile">
   <h4>Draw Pile</h4>
-  <img src="/images/cards/back.png" class="card" alt="back of card" />
+  <img phx-click="draw-cards" src="/images/cards/back.png" class="card" alt="back of card" />
 </section>
 
 <section class="players-played-cards">
@@ -13,7 +13,7 @@
 
 <section class="hand">
   <h4>Your Hand</h4>
-  <%= Enum.map(@player_state.hand, fn card -> %>
-    <img src="<%= card.image_url %>" class="card" alt="<%= card.name %>" />
-  <% end) %>
+  <%= for {card, index} <- Enum.with_index(@player_state.hand) do %>
+    <img src="<%= card.image_url %>" class="card card<%=index+1%>" alt="<%= card.name %>" />
+  <% end %>
 </section>

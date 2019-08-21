@@ -65,7 +65,7 @@ defmodule MonobolyDeal.Game.ServerTest do
       game_name = NameGenerator.generate()
       player1 = %Player{name: "player1"}
       {:ok, _pid} = Server.start_link(game_name, player1)
-      :ok = Server.deal_hand(game_name)
+      {:ok, _} = Server.deal_hand(game_name)
 
       player2 = %Player{name: "player2"}
       {:error, error} = Server.join(game_name, player2)

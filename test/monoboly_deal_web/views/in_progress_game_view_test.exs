@@ -55,11 +55,28 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
 
       html = render_click(view, "deal-hand")
       assert html =~ "<section class=\"hand\">"
+      assert html =~ "card1"
+      assert html =~ "card2"
+      assert html =~ "card3"
+      assert html =~ "card4"
+      assert html =~ "card5"
       assert html =~ "Your turn!" || "player1's turn!"
 
       player1_session = %{game_name: game_name, current_player: player1}
       {:ok, _view, html} = mount(Endpoint, InProgressGameView, session: player1_session)
       assert html =~ "<section class=\"hand\">"
+    end
+  end
+
+  describe "draw-cards" do
+    test "puts a card from the deck into your hand", %{game_name: game_name, player: player1} do
+      session = %{game_name: game_name, current_player: player1}
+      {:ok, view, _html} = mount(Endpoint, InProgressGameView, session: session)
+      render_click(view, "deal-hand")
+
+      html = render_click(view, "draw-cards")
+
+      assert html =~ "card6"
     end
   end
 end

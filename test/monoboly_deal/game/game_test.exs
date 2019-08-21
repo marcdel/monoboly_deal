@@ -135,13 +135,63 @@ defmodule MonobolyDeal.GameTest do
       player2: player2
     } do
       game = Game.deal(game)
-      %{whose_turn: whose_turn} = Game.game_state(game)
+      %{current_turn: current_turn} = Game.game_state(game)
 
-      case whose_turn do
-        ^player1 -> assert Game.player_state(game, player1).my_turn == true
-        ^player2 -> assert Game.player_state(game, player2).my_turn == true
-        _ -> flunk("Expected whose_turn to be player1 or player2, but was #{whose_turn}")
+      case current_turn.player do
+        ^player1 ->
+          assert Game.player_state(game, player1).my_turn == true
+
+        ^player2 ->
+          assert Game.player_state(game, player2).my_turn == true
+
+        _ ->
+          flunk(
+            "Expected player1 or player2 to be the current turn, but was #{
+              inspect(current_turn.player)
+            }"
+          )
       end
+    end
+  end
+
+  describe "drawing cards" do
+    setup do
+      game_name = NameGenerator.generate()
+      player1 = %Player{name: "player1"}
+      player2 = %Player{name: "player2"}
+
+      game =
+        game_name
+        |> Game.new(player1)
+        |> Game.join(player2)
+        |> (fn {:ok, game} -> Game.deal(game) end).()
+
+      %{
+        game_name: game_name,
+        game: game,
+        player1: player1,
+        player2: player2
+      }
+    end
+
+    test "draws two cards into the player's hand", %{game: game} do
+      game = Game.draw_cards(game, game.current_turn.player)
+      assert Enum.count(Game.player_state(game, game.current_turn.player).hand) == 7
+      assert Enum.count(Game.game_state(game).current_turn.drawn_cards) == 2
+    end
+
+    test "does nothing when not your turn", %{game: game, player1: player1, player2: player2} do
+      wrong_player = if game.current_turn.player == player1, do: player2, else: player1
+      game = Game.draw_cards(game, wrong_player)
+      assert Enum.count(Game.player_state(game, wrong_player).hand) == 5
+    end
+
+    test "does nothing if you've already drawn 2 cards", %{game: game} do
+      game = Game.draw_cards(game, game.current_turn.player)
+      game = Game.draw_cards(game, game.current_turn.player)
+
+      assert Enum.count(Game.player_state(game, game.current_turn.player).hand) == 7
+      assert Enum.count(Game.game_state(game).current_turn.drawn_cards) == 2
     end
   end
 
