@@ -1,10 +1,31 @@
 defmodule MonobolyDeal.Deck.Rent do
-  alias MonobolyDeal.Deck.Rent
+  alias MonobolyDeal.Deck.{Card, Rent}
 
-  defstruct [:name, :colors, :value, :image_url]
+  defstruct [:id, :name, :colors, :value, :image_url]
+
+  def new(:wild_rent_card) do
+    Rent.new([
+      :blue,
+      :green,
+      :red,
+      :yellow,
+      :pink,
+      :orange,
+      :light_blue,
+      :brown,
+      :railroad,
+      :utility
+    ])
+  end
 
   def new(colors) do
-    %Rent{name: :rent_card, value: 1, colors: colors, image_url: get_image_url(colors)}
+    %Rent{
+      id: Card.generate_id(),
+      name: :rent_card,
+      value: 1,
+      colors: colors,
+      image_url: get_image_url(colors)
+    }
   end
 
   defp get_image_url([:blue, :green]) do

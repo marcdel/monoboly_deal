@@ -19,7 +19,7 @@ defmodule MonobolyDeal.Game do
       players: [player],
       hands: %{player.name => []},
       discard_pile: [],
-      deck: Deck.shuffle(),
+      deck: Deck.new() |> Deck.shuffle(),
       started: false,
       current_turn: nil
     }
@@ -43,10 +43,16 @@ defmodule MonobolyDeal.Game do
     end
   end
 
-  def draw_cards(
-        %{current_turn: %{player: %{name: name}, drawn_cards: []}} = game,
-        %{name: name} = player
-      ) do
+  def draw_cards(%{current_turn: %{player: turn_player}} = game, current_player)
+      when turn_player != current_player do
+    game
+  end
+
+  def draw_cards(%{current_turn: %{drawn_cards: [_, _]}} = game, _) do
+    game
+  end
+
+  def draw_cards(game, player) do
     {cards, updated_deck} = Enum.split(game.deck, 2)
     player_hand = get_hand(game, player)
     updated_hands = %{game.hands | player.name => player_hand ++ cards}
@@ -59,7 +65,22 @@ defmodule MonobolyDeal.Game do
     }
   end
 
-  def draw_cards(game, _), do: game
+  def choose_card(%{current_turn: %{drawn_cards: []}}, _, _), do: {:error, :draw_cards}
+
+  def choose_card(%{current_turn: %{player: turn_player}}, current_player, _)
+      when turn_player != current_player do
+    {:error, :not_your_turn}
+  end
+
+  def choose_card(game, player, card_id) do
+    card = Game.find_card(game, player, card_id)
+    {:ok, %{game | current_turn: %{game.current_turn | chosen_card: card}}}
+  end
+
+  def find_card(game, player, card_id) do
+    hand = Game.get_hand(game, player)
+    Enum.find(hand, fn card -> card.id == card_id end)
+  end
 
   defp playing?(game, player) do
     Enum.any?(game.players, fn p -> p.name == player.name end)

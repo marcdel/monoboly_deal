@@ -1,10 +1,11 @@
 defmodule MonobolyDeal.Deck.WildProperty do
-  alias MonobolyDeal.Deck.WildProperty
+  alias MonobolyDeal.Deck.{Card, WildProperty}
 
-  defstruct [:name, :value, :image_url]
+  defstruct [:id, :name, :value, :image_url]
 
   def new do
     %WildProperty{
+      id: Card.generate_id(),
       name: :property_wild_card,
       value: 0,
       image_url: "/images/cards/property-wildcard.png"

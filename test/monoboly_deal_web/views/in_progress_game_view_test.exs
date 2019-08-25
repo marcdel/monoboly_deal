@@ -1,6 +1,6 @@
 defmodule MonobolyDealWeb.InProgressGameViewTest do
   use MonobolyDealWeb.ConnCase, async: true
-  import Phoenix.LiveViewTest, only: [mount: 3, render_click: 2]
+  import Phoenix.LiveViewTest, only: [mount: 3, render_click: 2, render_click: 3]
 
   alias MonobolyDeal.Game.{NameGenerator, Server, Supervisor}
   alias MonobolyDealWeb.{Endpoint, InProgressGameView}
@@ -77,6 +77,35 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
       html = render_click(view, "draw-cards")
 
       assert html =~ "card6"
+    end
+  end
+
+  describe "playing cards" do
+    test "shows an error when player hasn't drawn cards yet", %{
+      game_name: game_name,
+      player: player1
+    } do
+      session = %{game_name: game_name, current_player: player1}
+      {:ok, view, _html} = mount(Endpoint, InProgressGameView, session: session)
+      render_click(view, "deal-hand")
+
+      [card | _] = Server.get_hand(game_name, player1)
+      html = render_click(view, "choose-card", card.id)
+
+      assert html =~ "You need to draw 2 cards from the deck"
+    end
+
+    test "can place cards in the bank, or properties section", %{
+      game_name: game_name,
+      player: player1
+    } do
+      session = %{game_name: game_name, current_player: player1}
+      {:ok, view, _html} = mount(Endpoint, InProgressGameView, session: session)
+      render_click(view, "deal-hand")
+      render_click(view, "draw-cards")
+
+      [card | _] = Server.get_hand(game_name, player1)
+      assert render_click(view, "choose-card", card.id) =~ "chosen-card"
     end
   end
 end

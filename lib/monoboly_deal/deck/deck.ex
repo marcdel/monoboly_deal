@@ -8,11 +8,7 @@ defmodule MonobolyDeal.Deck do
     WildProperty
   }
 
-  def shuffle do
-    Enum.shuffle(cards())
-  end
-
-  def cards do
+  def new do
     []
     |> add_money_cards()
     |> add_action_cards()
@@ -20,6 +16,10 @@ defmodule MonobolyDeal.Deck do
     |> add_property_cards()
     |> add_dual_property_cards()
     |> add_wild_property_cards()
+  end
+
+  def shuffle(cards) do
+    Enum.shuffle(cards)
   end
 
   defp add_money_cards(cards) do
@@ -35,16 +35,16 @@ defmodule MonobolyDeal.Deck do
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   defp add_action_cards(cards) do
     cards
-    |> Kernel.++(for _ <- 1..2, do: Action.new(5, :deal_breaker))
-    |> Kernel.++(for _ <- 1..3, do: Action.new(4, :just_say_no))
-    |> Kernel.++(for _ <- 1..10, do: Action.new(1, :pass_go))
-    |> Kernel.++(for _ <- 1..3, do: Action.new(3, :forced_deal))
-    |> Kernel.++(for _ <- 1..3, do: Action.new(3, :sly_deal))
-    |> Kernel.++(for _ <- 1..3, do: Action.new(3, :debt_collector))
-    |> Kernel.++(for _ <- 1..3, do: Action.new(2, :its_my_birthday))
-    |> Kernel.++(for _ <- 1..2, do: Action.new(1, :double_the_rent))
-    |> Kernel.++(for _ <- 1..3, do: Action.new(3, :house))
-    |> Kernel.++(for _ <- 1..2, do: Action.new(4, :hotel))
+    |> Kernel.++(for _ <- 1..2, do: Action.new(:deal_breaker))
+    |> Kernel.++(for _ <- 1..3, do: Action.new(:just_say_no))
+    |> Kernel.++(for _ <- 1..10, do: Action.new(:pass_go))
+    |> Kernel.++(for _ <- 1..3, do: Action.new(:forced_deal))
+    |> Kernel.++(for _ <- 1..3, do: Action.new(:sly_deal))
+    |> Kernel.++(for _ <- 1..3, do: Action.new(:debt_collector))
+    |> Kernel.++(for _ <- 1..3, do: Action.new(:its_my_birthday))
+    |> Kernel.++(for _ <- 1..2, do: Action.new(:double_the_rent))
+    |> Kernel.++(for _ <- 1..3, do: Action.new(:house))
+    |> Kernel.++(for _ <- 1..2, do: Action.new(:hotel))
   end
 
   defp add_rent_cards(cards) do
@@ -54,85 +54,70 @@ defmodule MonobolyDeal.Deck do
     |> Kernel.++(for _ <- 1..2, do: Rent.new([:pink, :orange]))
     |> Kernel.++(for _ <- 1..2, do: Rent.new([:light_blue, :brown]))
     |> Kernel.++(for _ <- 1..2, do: Rent.new([:railroad, :utility]))
-    |> Kernel.++(
-      for _ <- 1..3,
-          do:
-            Rent.new([
-              :blue,
-              :green,
-              :red,
-              :yellow,
-              :pink,
-              :orange,
-              :light_blue,
-              :brown,
-              :railroad,
-              :utility
-            ])
-    )
+    |> Kernel.++(for _ <- 1..3, do: Rent.new(:wild_rent_card))
   end
 
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   defp add_property_cards(cards) do
     cards
-    |> Kernel.++(for _ <- 1..2, do: Property.new(4, :blue, [3, 8]))
-    |> Kernel.++(for _ <- 1..2, do: Property.new(1, :brown, [1, 2]))
-    |> Kernel.++(for _ <- 1..2, do: Property.new(2, :utility, [1, 2]))
-    |> Kernel.++(for _ <- 1..3, do: Property.new(4, :green, [2, 4, 7]))
-    |> Kernel.++(for _ <- 1..3, do: Property.new(3, :yellow, [2, 4, 6]))
-    |> Kernel.++(for _ <- 1..3, do: Property.new(3, :red, [2, 3, 6]))
-    |> Kernel.++(for _ <- 1..3, do: Property.new(2, :orange, [1, 3, 5]))
-    |> Kernel.++(for _ <- 1..3, do: Property.new(2, :pink, [1, 2, 4]))
-    |> Kernel.++(for _ <- 1..3, do: Property.new(1, :light_blue, [1, 2, 3]))
-    |> Kernel.++(for _ <- 1..4, do: Property.new(2, :railroad, [1, 2, 3, 4]))
+    |> Kernel.++(for _ <- 1..2, do: Property.new(:blue))
+    |> Kernel.++(for _ <- 1..2, do: Property.new(:brown))
+    |> Kernel.++(for _ <- 1..2, do: Property.new(:utility))
+    |> Kernel.++(for _ <- 1..3, do: Property.new(:green))
+    |> Kernel.++(for _ <- 1..3, do: Property.new(:yellow))
+    |> Kernel.++(for _ <- 1..3, do: Property.new(:red))
+    |> Kernel.++(for _ <- 1..3, do: Property.new(:orange))
+    |> Kernel.++(for _ <- 1..3, do: Property.new(:pink))
+    |> Kernel.++(for _ <- 1..3, do: Property.new(:light_blue))
+    |> Kernel.++(for _ <- 1..4, do: Property.new(:railroad))
   end
 
   defp add_dual_property_cards(cards) do
     cards
     |> Kernel.++([
       DualProperty.new(
-        Property.new(4, :blue, [3, 8]),
-        Property.new(4, :green, [2, 4, 7])
+        Property.new(:blue),
+        Property.new(:green)
       )
     ])
     |> Kernel.++([
       DualProperty.new(
-        Property.new(4, :green, [2, 4, 7]),
-        Property.new(2, :railroad, [1, 2, 3, 4])
+        Property.new(:green),
+        Property.new(:railroad)
       )
     ])
     |> Kernel.++([
       DualProperty.new(
-        Property.new(2, :utility, [1, 2]),
-        Property.new(2, :railroad, [1, 2, 3, 4])
+        Property.new(:utility),
+        Property.new(:railroad)
       )
     ])
     |> Kernel.++([
       DualProperty.new(
-        Property.new(1, :light_blue, [1, 2, 3]),
-        Property.new(2, :railroad, [1, 2, 3, 4])
+        Property.new(:light_blue),
+        Property.new(:railroad)
       )
     ])
     |> Kernel.++([
       DualProperty.new(
-        Property.new(1, :light_blue, [1, 2, 3]),
-        Property.new(1, :brown, [1, 2])
+        Property.new(:light_blue),
+        Property.new(:brown)
       )
     ])
     |> Kernel.++(
       for _ <- 1..2,
           do:
             DualProperty.new(
-              Property.new(2, :pink, [1, 2, 4]),
-              Property.new(2, :orange, [1, 3, 5])
+              Property.new(:pink),
+              Property.new(:orange)
             )
     )
     |> Kernel.++(
       for _ <- 1..2,
           do:
             DualProperty.new(
-              Property.new(3, :red, [2, 3, 6]),
-              Property.new(3, :yellow, [2, 4, 6])
+              Property.new(:red),
+              Property.new(:yellow)
             )
     )
   end

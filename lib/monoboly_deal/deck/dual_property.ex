@@ -1,10 +1,11 @@
 defmodule MonobolyDeal.Deck.DualProperty do
-  alias MonobolyDeal.Deck.DualProperty
+  alias MonobolyDeal.Deck.{Card, DualProperty}
 
-  defstruct [:name, :value, :properties, :image_url]
+  defstruct [:id, :name, :value, :properties, :image_url]
 
   def new(property1, property2) do
     %DualProperty{
+      id: Card.generate_id(),
       name: :dual_property_card,
       value: property1.value,
       properties: [property1, property2],

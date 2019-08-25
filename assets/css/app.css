@@ -111,3 +111,7 @@ section > h4 {
   height: 200px;
   width: 145px;
 }
+
+.card.chosen-card {
+  border: 2px solid deepskyblue;
+}

@@ -43,27 +43,43 @@ defmodule MonobolyDealWeb.InProgressGameView do
 
   def handle_event("draw-cards", _value, socket) do
     %{game_name: game_name, current_player: current_player} = socket.assigns
-
     Server.draw_cards(game_name, current_player)
+    {:noreply, update_state(socket)}
+  end
 
-    player_state = Server.player_state(game_name, current_player)
-    game_state = Server.game_state(game_name)
+  def handle_event("choose-card", card_id, socket) do
+    %{game_name: game_name, current_player: current_player} = socket.assigns
 
-    socket = assign(socket, player_state: player_state, game_state: game_state)
+    case Server.choose_card(game_name, current_player, card_id) do
+      {:ok, _} ->
+        {:noreply, update_state(socket)}
 
-    {:noreply, socket}
+      {:error, _error} ->
+        socket =
+          socket
+          |> clear_messages()
+          |> assign(error_message: "You need to draw 2 cards from the deck")
+
+        {:noreply, update_state(socket)}
+    end
   end
 
   def handle_info(:tick, socket) do
-    game_state = Server.game_state(socket.assigns.game_name)
-    player_state = Server.player_state(socket.assigns.game_name, socket.assigns.current_player)
+    {:noreply, update_state(socket)}
+  end
 
-    socket =
-      socket
-      |> assign(player_state: player_state, game_state: game_state)
-      |> set_player_turn_message(player_state, game_state)
+  defp update_state(socket) do
+    %{game_name: game_name, current_player: current_player} = socket.assigns
+    player_state = Server.player_state(game_name, current_player)
+    game_state = Server.game_state(game_name)
 
-    {:noreply, socket}
+    assign(socket, player_state: player_state, game_state: game_state)
+  end
+
+  defp clear_messages(socket) do
+    socket
+    |> assign(error_message: "")
+    |> assign(info_message: "")
   end
 
   defp set_player_turn_message(socket, _, %{current_turn: nil}), do: socket

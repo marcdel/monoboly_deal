@@ -1,10 +1,15 @@
 defmodule MonobolyDeal.Deck.Money do
-  alias MonobolyDeal.Deck.Money
+  alias MonobolyDeal.Deck.{Card, Money}
 
-  defstruct [:name, :value, :image_url]
+  defstruct [:id, :name, :value, :image_url]
 
   def new(value) do
-    %Money{name: :money_card, value: value, image_url: get_image_url(value)}
+    %Money{
+      id: Card.generate_id(),
+      name: :money_card,
+      value: value,
+      image_url: get_image_url(value)
+    }
   end
 
   defp get_image_url(1), do: "/images/cards/money-1m.png"

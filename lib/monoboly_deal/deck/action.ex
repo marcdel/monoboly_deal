@@ -1,20 +1,99 @@
 defmodule MonobolyDeal.Deck.Action do
-  alias MonobolyDeal.Deck.Action
+  alias MonobolyDeal.Deck.{Action, Card}
 
-  defstruct [:name, :type, :value, :image_url]
+  defstruct [:id, :name, :type, :value, :image_url]
 
-  def new(value, type) do
-    %Action{name: :action_card, value: value, type: type, image_url: get_image_url(type)}
+  def new(type) do
+    case type do
+      :deal_breaker ->
+        %Action{
+          id: Card.generate_id(),
+          name: :action_card,
+          value: 5,
+          type: type,
+          image_url: "/images/cards/deal-breaker.png"
+        }
+
+      :just_say_no ->
+        %Action{
+          id: Card.generate_id(),
+          name: :action_card,
+          value: 4,
+          type: type,
+          image_url: "/images/cards/say-no.png"
+        }
+
+      :pass_go ->
+        %Action{
+          id: Card.generate_id(),
+          name: :action_card,
+          value: 1,
+          type: type,
+          image_url: "/images/cards/pass-go.png"
+        }
+
+      :forced_deal ->
+        %Action{
+          id: Card.generate_id(),
+          name: :action_card,
+          value: 3,
+          type: type,
+          image_url: "/images/cards/forced-deal.png"
+        }
+
+      :sly_deal ->
+        %Action{
+          id: Card.generate_id(),
+          name: :action_card,
+          value: 3,
+          type: type,
+          image_url: "/images/cards/sly-deal.png"
+        }
+
+      :debt_collector ->
+        %Action{
+          id: Card.generate_id(),
+          name: :action_card,
+          value: 3,
+          type: type,
+          image_url: "/images/cards/debt-collector.png"
+        }
+
+      :its_my_birthday ->
+        %Action{
+          id: Card.generate_id(),
+          name: :action_card,
+          value: 2,
+          type: type,
+          image_url: "/images/cards/birthday.png"
+        }
+
+      :double_the_rent ->
+        %Action{
+          id: Card.generate_id(),
+          name: :action_card,
+          value: 1,
+          type: type,
+          image_url: "/images/cards/double-rent.png"
+        }
+
+      :house ->
+        %Action{
+          id: Card.generate_id(),
+          name: :action_card,
+          value: 3,
+          type: type,
+          image_url: "/images/cards/house.png"
+        }
+
+      :hotel ->
+        %Action{
+          id: Card.generate_id(),
+          name: :action_card,
+          value: 4,
+          type: type,
+          image_url: "/images/cards/hotel.png"
+        }
+    end
   end
-
-  defp get_image_url(:deal_breaker), do: "/images/cards/deal-breaker.png"
-  defp get_image_url(:just_say_no), do: "/images/cards/say-no.png"
-  defp get_image_url(:pass_go), do: "/images/cards/pass-go.png"
-  defp get_image_url(:forced_deal), do: "/images/cards/forced-deal.png"
-  defp get_image_url(:sly_deal), do: "/images/cards/sly-deal.png"
-  defp get_image_url(:debt_collector), do: "/images/cards/debt-collector.png"
-  defp get_image_url(:its_my_birthday), do: "/images/cards/birthday.png"
-  defp get_image_url(:double_the_rent), do: "/images/cards/double-rent.png"
-  defp get_image_url(:house), do: "/images/cards/house.png"
-  defp get_image_url(:hotel), do: "/images/cards/hotel.png"
 end

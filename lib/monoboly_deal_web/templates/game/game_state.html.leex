@@ -7,13 +7,17 @@
   <img phx-click="draw-cards" src="/images/cards/back.png" class="card" alt="back of card" />
 </section>
 
-<section class="players-played-cards">
-  <h4>Your Played Cards</h4>
+<section class="player-bank">
+  <h4>Bank</h4>
+</section>
+
+<section class="player-properties">
+  <h4>Properties</h4>
 </section>
 
 <section class="hand">
   <h4>Your Hand</h4>
   <%= for {card, index} <- Enum.with_index(@player_state.hand) do %>
-    <img src="<%= card.image_url %>" class="card card<%=index+1%>" alt="<%= card.name %>" />
+    <img phx-click="choose-card" phx-value="<%= card.id %>" src="<%= card.image_url %>" class="card card<%=index+1%> <%= if @game_state.current_turn != nil && @game_state.current_turn.chosen_card != nil && @game_state.current_turn.chosen_card.id == card.id, do: "chosen-card" %>" alt="<%= card.name %>" />
   <% end %>
 </section>

@@ -23,9 +23,7 @@ defmodule MonobolyDeal.GameTest do
       game = Game.new(game_name, player)
 
       assert game.discard_pile == []
-
-      assert game.deck -- Deck.cards() == []
-      refute game.deck == Deck.cards()
+      assert Enum.count(game.deck) == Enum.count(Deck.new())
     end
 
     test "starts with empty hands" do
@@ -192,6 +190,44 @@ defmodule MonobolyDeal.GameTest do
 
       assert Enum.count(Game.player_state(game, game.current_turn.player).hand) == 7
       assert Enum.count(Game.game_state(game).current_turn.drawn_cards) == 2
+    end
+  end
+
+  describe "playing cards" do
+    setup do
+      game_name = NameGenerator.generate()
+      player1 = %Player{name: "player1"}
+
+      game =
+        game_name
+        |> Game.new(player1)
+        |> Game.deal()
+        |> Game.draw_cards(player1)
+
+      %{
+        game_name: game_name,
+        game: game,
+        player1: player1
+      }
+    end
+
+    test "must be player's turn", %{game: game} do
+      player2 = %Player{name: "player2"}
+      {:error, :not_your_turn} = Game.choose_card(game, player2, "the card id")
+    end
+
+    test "must draw 2 cards before playing cards from your hand", %{game: game, player1: player1} do
+      game = %{game | current_turn: %{game.current_turn | drawn_cards: []}}
+      {:error, :draw_cards} = Game.choose_card(game, player1, "the card id")
+    end
+
+    test "sets the chosen card in the current turn", %{game: game, player1: player1} do
+      game = Game.draw_cards(game, player1)
+      [card | _] = Game.get_hand(game, player1)
+
+      {:ok, game} = Game.choose_card(game, player1, card.id)
+
+      assert %{player: ^player1, chosen_card: ^card, drawn_cards: [_, _]} = game.current_turn
     end
   end
 
