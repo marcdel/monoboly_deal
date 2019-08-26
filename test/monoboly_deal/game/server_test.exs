@@ -172,4 +172,21 @@ defmodule MonobolyDeal.Game.ServerTest do
       assert game.current_turn.chosen_card == card
     end
   end
+
+  describe "place_card_bank" do
+    test "places the chosen card in the player's bank" do
+      game_name = NameGenerator.generate()
+      player = Player.new("player1")
+      {:ok, _pid} = Server.start_link(game_name, player)
+      Server.deal_hand(game_name)
+      Server.draw_cards(game_name, player)
+      [card | _] = Server.get_hand(game_name, player)
+
+      {:ok, _} = Server.choose_card(game_name, player, card.id)
+      {:ok, game} = Server.place_card_bank(game_name, player)
+
+      assert game.current_turn.chosen_card == nil
+      assert Server.player_state(game_name, player).bank == [card]
+    end
+  end
 end

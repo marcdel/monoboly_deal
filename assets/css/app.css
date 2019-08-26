@@ -97,10 +97,15 @@ main.game-page {
 
 .game-container {
   width: 80%;
+  margin-right: 5rem;
 }
 
 .players-container {
   width: 20%;
+}
+
+.hand, .player-properties, .player-bank, .draw-pile, .opponents-played-cards {
+  height: 20rem;
 }
 
 section > h4 {
@@ -108,8 +113,8 @@ section > h4 {
 }
 
 .card {
-  height: 200px;
-  width: 145px;
+  height: 15rem;
+  width: 10rem;
 }
 
 .card.chosen-card {

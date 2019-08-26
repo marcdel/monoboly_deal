@@ -2,12 +2,12 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
   use MonobolyDealWeb.ConnCase, async: true
   import Phoenix.LiveViewTest, only: [mount: 3, render_click: 2, render_click: 3]
 
-  alias MonobolyDeal.Game.{NameGenerator, Server, Supervisor}
+  alias MonobolyDeal.Game.{NameGenerator, Player, Server, Supervisor}
   alias MonobolyDealWeb.{Endpoint, InProgressGameView}
 
   setup do
     game_name = NameGenerator.generate()
-    player = %{name: "player1"}
+    player = Player.new("player1")
 
     Supervisor.start_game(game_name, player)
 
@@ -17,17 +17,17 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
   describe "mount/2" do
     test "displays the game name, a Deal button, and the player's name", %{
       game_name: game_name,
-      player: player
+      player: player1
     } do
-      session = %{game_name: game_name, current_player: player}
+      session = %{game_name: game_name, current_player: player1}
       {:ok, _view, html} = mount(Endpoint, InProgressGameView, session: session)
       assert html =~ game_name
-      assert html =~ player.name
+      assert html =~ player1.name
       assert html =~ "Deal"
     end
 
     test "joins the game if not already playing", %{game_name: game_name, player: player1} do
-      player2 = %{name: "player2"}
+      player2 = Player.new("player2")
       player2_session = %{game_name: game_name, current_player: player2}
       {:ok, _view, html} = mount(Endpoint, InProgressGameView, session: player2_session)
       assert html =~ game_name
@@ -49,17 +49,17 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
       game_name: game_name,
       player: player1
     } do
-      player2 = %{name: "player2"}
+      player2 = Player.new("player2")
       player2_session = %{game_name: game_name, current_player: player2}
       {:ok, view, _html} = mount(Endpoint, InProgressGameView, session: player2_session)
 
       html = render_click(view, "deal-hand")
       assert html =~ "<section class=\"hand\">"
-      assert html =~ "card1"
-      assert html =~ "card2"
-      assert html =~ "card3"
-      assert html =~ "card4"
-      assert html =~ "card5"
+      assert html =~ "hand-card1"
+      assert html =~ "hand-card2"
+      assert html =~ "hand-card3"
+      assert html =~ "hand-card4"
+      assert html =~ "hand-card5"
       assert html =~ "Your turn!" || "player1's turn!"
 
       player1_session = %{game_name: game_name, current_player: player1}
@@ -76,7 +76,8 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
 
       html = render_click(view, "draw-cards")
 
-      assert html =~ "card6"
+      assert html =~ "hand-card6"
+      assert html =~ "hand-card7"
     end
   end
 
@@ -102,10 +103,15 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
       session = %{game_name: game_name, current_player: player1}
       {:ok, view, _html} = mount(Endpoint, InProgressGameView, session: session)
       render_click(view, "deal-hand")
+      [card | _] = Server.get_hand(game_name, player1)
+
+      assert render_click(view, "choose-card", card.id) =~
+               "You need to draw 2 cards from the deck"
+
       render_click(view, "draw-cards")
 
-      [card | _] = Server.get_hand(game_name, player1)
       assert render_click(view, "choose-card", card.id) =~ "chosen-card"
+      assert render_click(view, "place-card-bank") =~ "bank-card1"
     end
   end
 end

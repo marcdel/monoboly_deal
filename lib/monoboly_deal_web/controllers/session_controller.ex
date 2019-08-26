@@ -9,7 +9,7 @@ defmodule MonobolyDealWeb.SessionController do
   end
 
   def create(conn, %{"player" => %{"name" => name}}) do
-    player = %Player{name: name}
+    player = Player.new(name)
 
     conn
     |> Auth.login(player)

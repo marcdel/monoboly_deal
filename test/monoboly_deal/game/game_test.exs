@@ -193,7 +193,7 @@ defmodule MonobolyDeal.GameTest do
     end
   end
 
-  describe "playing cards" do
+  describe "choosing a card" do
     setup do
       game_name = NameGenerator.generate()
       player1 = %Player{name: "player1"}
@@ -205,7 +205,6 @@ defmodule MonobolyDeal.GameTest do
         |> Game.draw_cards(player1)
 
       %{
-        game_name: game_name,
         game: game,
         player1: player1
       }
@@ -228,6 +227,48 @@ defmodule MonobolyDeal.GameTest do
       {:ok, game} = Game.choose_card(game, player1, card.id)
 
       assert %{player: ^player1, chosen_card: ^card, drawn_cards: [_, _]} = game.current_turn
+    end
+  end
+
+  describe "placing a card in your bank" do
+    setup do
+      game_name = NameGenerator.generate()
+      player1 = Player.new("player1")
+
+      {game, card} =
+        game_name
+        |> Game.new(player1)
+        |> Game.deal()
+        |> Game.draw_cards(player1)
+        |> (fn game ->
+              [card | _] = Game.get_hand(game, player1)
+              {:ok, game} = Game.choose_card(game, player1, card.id)
+              {game, card}
+            end).()
+
+      %{
+        game: game,
+        card: card,
+        player1: player1
+      }
+    end
+
+    test "must be player's turn", %{game: game} do
+      player2 = %Player{name: "player2"}
+      {:error, :not_your_turn} = Game.place_card_bank(game, player2)
+    end
+
+    test "must have chosen a card", %{game: game, player1: player1} do
+      game = %{game | current_turn: %{game.current_turn | chosen_card: nil}}
+      {:error, :choose_card} = Game.place_card_bank(game, player1)
+    end
+
+    test "moves the chosen card to your bank", %{game: game, card: card, player1: player1} do
+      {:ok, game} = Game.place_card_bank(game, player1)
+
+      assert Game.find_player(game, player1).bank == [card]
+      assert Game.find_card(game, player1, card.id) == nil
+      assert game.current_turn.chosen_card == nil
     end
   end
 

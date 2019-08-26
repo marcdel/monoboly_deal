@@ -1,5 +1,6 @@
 defmodule MonobolyDealWeb.SessionControllerTest do
   use MonobolyDealWeb.ConnCase, async: true
+  alias MonobolyDeal.Game.Player
 
   describe "new session" do
     test "renders a form", %{conn: conn} do
@@ -12,8 +13,9 @@ defmodule MonobolyDealWeb.SessionControllerTest do
     test "creates a session for the current player", %{conn: conn} do
       attrs = %{"name" => "player1"}
       conn = post(conn, Routes.session_path(conn, :create), player: attrs)
+      player1 = Player.new("player1")
 
-      assert %{name: "player1"} = get_session(conn, :current_player)
+      assert player1 == get_session(conn, :current_player)
       assert redirected_to(conn) == Routes.game_path(conn, :new)
     end
 
