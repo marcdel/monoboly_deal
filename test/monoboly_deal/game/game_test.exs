@@ -265,8 +265,10 @@ defmodule MonobolyDeal.GameTest do
 
     test "moves the chosen card to your bank", %{game: game, card: card, player1: player1} do
       {:ok, game} = Game.place_card_bank(game, player1)
+      player_state = Game.player_state(game, player1)
 
-      assert Game.find_player(game, player1).bank == [card]
+      assert player_state.bank == [card]
+      assert player_state.bank_total == card.value
       assert Game.find_card(game, player1, card.id) == nil
       assert game.current_turn.chosen_card == nil
     end

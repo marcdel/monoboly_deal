@@ -156,11 +156,11 @@ defmodule MonobolyDeal.Game do
   end
 
   defp add_to_bank(%{bank: nil} = player, card) do
-    %{player | bank: [card]}
+    %{player | bank: [card], bank_total: card.value}
   end
 
   defp add_to_bank(player, card) do
-    %{player | bank: player.bank ++ [card]}
+    %{player | bank: player.bank ++ [card], bank_total: player.bank_total + card.value}
   end
 
   defp playing?(game, player) do
@@ -173,6 +173,7 @@ defmodule MonobolyDeal.Game do
     %{
       name: player.name,
       bank: player.bank,
+      bank_total: player.bank_total,
       hand: get_hand(game, player),
       my_turn: false
     }
@@ -182,6 +183,7 @@ defmodule MonobolyDeal.Game do
     %{
       name: player.name,
       bank: player.bank,
+      bank_total: player.bank_total,
       hand: get_hand(game, player),
       my_turn: game.current_turn.player == player
     }

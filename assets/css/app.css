@@ -91,6 +91,8 @@ div.phx-connected {
   width: 100%;
 }
 
+/* Game specific styles */
+
 main.game-page {
   display: flex;
 }
@@ -104,8 +106,16 @@ main.game-page {
   width: 20%;
 }
 
+.player-played-cards {
+  display: flex;
+}
+
+.player-played-cards * {
+  width: 50%;
+}
+
 .hand, .player-properties, .player-bank, .draw-pile, .opponents-played-cards {
-  height: 20rem;
+  min-height: 20rem;
 }
 
 section > h4 {

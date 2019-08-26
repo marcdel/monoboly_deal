@@ -111,7 +111,9 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
       render_click(view, "draw-cards")
 
       assert render_click(view, "choose-card", card.id) =~ "chosen-card"
-      assert render_click(view, "place-card-bank") =~ "bank-card1"
+      html = render_click(view, "place-card-bank")
+      assert html =~ "bank-card1"
+      assert html =~ "Bank (#{card.value}M)"
     end
   end
 end
