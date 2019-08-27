@@ -13,7 +13,7 @@ defmodule MonobolyDeal.Game do
 
   alias MonobolyDeal.Deck
   alias MonobolyDeal.Game
-  alias MonobolyDeal.Game.Turn
+  alias MonobolyDeal.Game.{Player,Turn}
 
   def new(name, player) do
     %Game{
@@ -102,7 +102,7 @@ defmodule MonobolyDeal.Game do
 
     updated_players =
       Enum.map(game.players, fn
-        %{name: ^name} = found_player -> add_to_bank(found_player, card)
+        %{name: ^name} = found_player -> Player.add_to_bank(found_player, card)
         other_player -> other_player
       end)
 
@@ -153,14 +153,6 @@ defmodule MonobolyDeal.Game do
   def compare_players(%{name: name}, %{name: name}), do: true
   def compare_players(%{name: p1}, %{name: p2}) when p1 != p2, do: false
 
-  defp add_to_bank(%{bank: nil} = player, card) do
-    %{player | bank: [card], bank_total: card.value}
-  end
-
-  defp add_to_bank(player, card) do
-    %{player | bank: player.bank ++ [card], bank_total: player.bank_total + card.value}
-  end
-
   defp add_cards_to_player_hand(game, player, cards) do
     player_hand = get_hand(game, player)
     updated_hands = %{game.hands | player.name => player_hand ++ cards}
@@ -169,7 +161,7 @@ defmodule MonobolyDeal.Game do
 
     updated_players =
       Enum.map(game.players, fn
-        %{name: ^name} -> %{player | hand: player.hand ++ cards}
+        %{name: ^name} -> Player.add_to_hand(player, cards)
         other_player -> other_player
       end)
 
