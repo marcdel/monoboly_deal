@@ -10,10 +10,20 @@ defmodule MonobolyDeal.Game.Player do
   end
 
   def add_to_bank(%{bank: nil} = player, card) do
-    %{player | bank: [card], bank_total: card.value}
+    %{
+      player
+      | bank: [card],
+        bank_total: card.value,
+        hand: Enum.reject(player.hand, fn c -> c.id == card.id end)
+    }
   end
 
   def add_to_bank(player, card) do
-    %{player | bank: player.bank ++ [card], bank_total: player.bank_total + card.value}
+    %{
+      player
+      | bank: player.bank ++ [card],
+        bank_total: player.bank_total + card.value,
+        hand: Enum.reject(player.hand, fn c -> c.id == card.id end)
+    }
   end
 end

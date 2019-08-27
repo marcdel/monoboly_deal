@@ -4,7 +4,6 @@ defmodule MonobolyDeal.Game do
   defstruct [
     :name,
     :players,
-    :hands,
     :discard_pile,
     :deck,
     :started,
@@ -13,13 +12,12 @@ defmodule MonobolyDeal.Game do
 
   alias MonobolyDeal.Deck
   alias MonobolyDeal.Game
-  alias MonobolyDeal.Game.{Player,Turn}
+  alias MonobolyDeal.Game.{Player, Turn}
 
   def new(name, player) do
     %Game{
       name: name,
-      players: [player],
-      hands: %{player.name => []},
+      players: [Player.new(player.name)],
       discard_pile: [],
       deck: Deck.new() |> Deck.shuffle(),
       started: false,
@@ -37,8 +35,7 @@ defmodule MonobolyDeal.Game do
   def join(game, player) do
     case playing?(game, player) do
       false ->
-        {:ok,
-         %{game | players: game.players ++ [player], hands: Map.put(game.hands, player.name, [])}}
+        {:ok, %{game | players: game.players ++ [player]}}
 
       true ->
         {:ok, game}
@@ -106,20 +103,8 @@ defmodule MonobolyDeal.Game do
         other_player -> other_player
       end)
 
-    player_hand = get_hand(game, player)
-
-    updated_hands = %{
-      game.hands
-      | player.name => Enum.reject(player_hand, fn c -> c.id == card.id end)
-    }
-
     {:ok,
-     %{
-       game
-       | players: updated_players,
-         hands: updated_hands,
-         current_turn: %{game.current_turn | chosen_card: nil}
-     }}
+     %{game | players: updated_players, current_turn: %{game.current_turn | chosen_card: nil}}}
   end
 
   def find_card(game, player, card_id) do
@@ -143,7 +128,7 @@ defmodule MonobolyDeal.Game do
   end
 
   def get_hand(game, player) do
-    Map.fetch!(game.hands, player.name)
+    find_player(game, player).hand
   end
 
   def find_player(game, player) do
@@ -154,9 +139,7 @@ defmodule MonobolyDeal.Game do
   def compare_players(%{name: p1}, %{name: p2}) when p1 != p2, do: false
 
   defp add_cards_to_player_hand(game, player, cards) do
-    player_hand = get_hand(game, player)
-    updated_hands = %{game.hands | player.name => player_hand ++ cards}
-
+    player = find_player(game, player)
     %{name: name} = player
 
     updated_players =
@@ -165,7 +148,7 @@ defmodule MonobolyDeal.Game do
         other_player -> other_player
       end)
 
-    %{game | players: updated_players, hands: updated_hands}
+    %{game | players: updated_players}
   end
 
   defp playing?(game, player) do

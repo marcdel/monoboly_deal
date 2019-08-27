@@ -13,7 +13,7 @@ defmodule MonobolyDeal.GameTest do
       game = Game.new(game_name, player)
 
       assert game.name == game_name
-      assert game.players == [player]
+      assert game.players == [Game.find_player(game, player)]
     end
 
     test "starts with an empty discard pile and a shuffled deck" do
@@ -32,7 +32,7 @@ defmodule MonobolyDeal.GameTest do
 
       game = Game.new(game_name, player)
 
-      assert game.hands == %{"player1" => []}
+      assert Game.player_state(game, player).hand == []
     end
   end
 
@@ -115,10 +115,14 @@ defmodule MonobolyDeal.GameTest do
       assert game.started == true
     end
 
-    test "each player is dealt a hand of 5 cards", %{game: game} do
+    test "each player is dealt a hand of 5 cards", %{
+      game: game,
+      player1: player1,
+      player2: player2
+    } do
       game = Game.deal(game)
-      assert Enum.count(game.hands["player1"]) == 5
-      assert Enum.count(game.hands["player2"]) == 5
+      assert Enum.count(Game.find_player(game, player1).hand) == 5
+      assert Enum.count(Game.find_player(game, player2).hand) == 5
     end
 
     test "dealt cards are removed from the deck", %{game: game} do
