@@ -39,8 +39,8 @@ defmodule MonobolyDeal.GameTest do
   describe "join/2" do
     setup do
       game_name = NameGenerator.generate()
-      player1 = %Player{name: "player1"}
-      player2 = %Player{name: "player2"}
+      player1 = Player.new("player1")
+      player2 = Player.new("player2")
 
       game = Game.new(game_name, player1)
 
@@ -93,8 +93,8 @@ defmodule MonobolyDeal.GameTest do
   describe "dealing a hand" do
     setup do
       game_name = NameGenerator.generate()
-      player1 = %Player{name: "player1"}
-      player2 = %Player{name: "player2"}
+      player1 = Player.new("player1")
+      player2 = Player.new("player2")
 
       game = Game.new(game_name, player1)
       {:ok, game} = Game.join(game, player2)
@@ -127,36 +127,17 @@ defmodule MonobolyDeal.GameTest do
       assert Enum.count(game.deck) == 96
     end
 
-    test "chooses a player to have the first turn", %{
-      game: game,
-      player1: player1,
-      player2: player2
-    } do
+    test "chooses a player to have the first turn", %{game: game} do
       game = Game.deal(game)
-      %{current_turn: current_turn} = Game.game_state(game)
-
-      case current_turn.player do
-        ^player1 ->
-          assert Game.player_state(game, player1).my_turn == true
-
-        ^player2 ->
-          assert Game.player_state(game, player2).my_turn == true
-
-        _ ->
-          flunk(
-            "Expected player1 or player2 to be the current turn, but was #{
-              inspect(current_turn.player)
-            }"
-          )
-      end
+      assert Game.game_state(game).current_turn != nil
     end
   end
 
   describe "drawing cards" do
     setup do
       game_name = NameGenerator.generate()
-      player1 = %Player{name: "player1"}
-      player2 = %Player{name: "player2"}
+      player1 = Player.new("player1")
+      player2 = Player.new("player2")
 
       game =
         game_name
@@ -179,7 +160,9 @@ defmodule MonobolyDeal.GameTest do
     end
 
     test "does nothing when not your turn", %{game: game, player1: player1, player2: player2} do
-      wrong_player = if game.current_turn.player == player1, do: player2, else: player1
+      wrong_player =
+        if Game.compare_players(game.current_turn.player, player1), do: player2, else: player1
+
       game = Game.draw_cards(game, wrong_player)
       assert Enum.count(Game.player_state(game, wrong_player).hand) == 5
     end
@@ -196,7 +179,7 @@ defmodule MonobolyDeal.GameTest do
   describe "choosing a card" do
     setup do
       game_name = NameGenerator.generate()
-      player1 = %Player{name: "player1"}
+      player1 = Player.new("player1")
 
       game =
         game_name
@@ -206,12 +189,12 @@ defmodule MonobolyDeal.GameTest do
 
       %{
         game: game,
-        player1: player1
+        player1: Game.find_player(game, player1)
       }
     end
 
     test "must be player's turn", %{game: game} do
-      player2 = %Player{name: "player2"}
+      player2 = Player.new("player2")
       {:error, :not_your_turn} = Game.choose_card(game, player2, "the card id")
     end
 
@@ -221,12 +204,13 @@ defmodule MonobolyDeal.GameTest do
     end
 
     test "sets the chosen card in the current turn", %{game: game, player1: player1} do
-      game = Game.draw_cards(game, player1)
       [card | _] = Game.get_hand(game, player1)
 
       {:ok, game} = Game.choose_card(game, player1, card.id)
 
-      assert %{player: ^player1, chosen_card: ^card, drawn_cards: [_, _]} = game.current_turn
+      assert game.current_turn.player.name == player1.name
+      assert game.current_turn.chosen_card == card
+      assert [_, _] = game.current_turn.drawn_cards
     end
   end
 
@@ -254,7 +238,7 @@ defmodule MonobolyDeal.GameTest do
     end
 
     test "must be player's turn", %{game: game} do
-      player2 = %Player{name: "player2"}
+      player2 = Player.new("player2")
       {:error, :not_your_turn} = Game.place_card_bank(game, player2)
     end
 
@@ -319,8 +303,8 @@ defmodule MonobolyDeal.GameTest do
 
   defp create_started_game do
     game_name = NameGenerator.generate()
-    player1 = %Player{name: "player1"}
-    player2 = %Player{name: "player2"}
+    player1 = Player.new("player1")
+    player2 = Player.new("player2")
 
     game_name
     |> Game.new(player1)

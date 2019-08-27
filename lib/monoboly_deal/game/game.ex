@@ -1,4 +1,6 @@
 defmodule MonobolyDeal.Game do
+  # Most of the time I don't want to see the entire deck in the output
+  @derive {Inspect, except: [:deck]}
   defstruct [
     :name,
     :players,
@@ -43,32 +45,41 @@ defmodule MonobolyDeal.Game do
     end
   end
 
-  def draw_cards(%{current_turn: %{player: turn_player}} = game, current_player)
-      when turn_player != current_player do
+  def deal(game) do
+    game =
+      Enum.reduce(
+        game.players,
+        game,
+        fn player, game ->
+          {hand, updated_deck} = Enum.split(game.deck, 5)
+          game = add_cards_to_player_hand(game, player, hand)
+
+          %{game | deck: updated_deck, started: true}
+        end
+      )
+
+    %{game | started: true, current_turn: Turn.new(Enum.random(game.players))}
+  end
+
+  def draw_cards(%{current_turn: %{player: %{name: p1}}} = game, %{name: p2}) when p1 != p2 do
+    #    IO.inspect({:error, :not_your_turn})
     game
   end
 
   def draw_cards(%{current_turn: %{drawn_cards: [_, _]}} = game, _) do
+    #    IO.inspect({:error, :already_drawn_cards})
     game
   end
 
   def draw_cards(game, player) do
     {cards, updated_deck} = Enum.split(game.deck, 2)
-    player_hand = get_hand(game, player)
-    updated_hands = %{game.hands | player.name => player_hand ++ cards}
-
-    %{
-      game
-      | hands: updated_hands,
-        deck: updated_deck,
-        current_turn: %{game.current_turn | drawn_cards: cards}
-    }
+    game = add_cards_to_player_hand(game, player, cards)
+    %{game | deck: updated_deck, current_turn: %{game.current_turn | drawn_cards: cards}}
   end
 
   def choose_card(%{current_turn: %{drawn_cards: []}}, _, _), do: {:error, :draw_cards}
 
-  def choose_card(%{current_turn: %{player: turn_player}}, current_player, _)
-      when turn_player != current_player do
+  def choose_card(%{current_turn: %{player: %{name: p1}}}, %{name: p2}, _) when p1 != p2 do
     {:error, :not_your_turn}
   end
 
@@ -81,11 +92,11 @@ defmodule MonobolyDeal.Game do
     {:error, :choose_card}
   end
 
-  def place_card_bank(%{current_turn: %{player: p1}}, p2) when p1 != p2 do
+  def place_card_bank(%{current_turn: %{player: %{name: p1}}}, %{name: p2}) when p1 != p2 do
     {:error, :not_your_turn}
   end
 
-  def place_card_bank(%{current_turn: %{player: player}} = game, player) do
+  def place_card_bank(game, player) do
     %{name: name} = player
     card = game.current_turn.chosen_card
 
@@ -116,22 +127,6 @@ defmodule MonobolyDeal.Game do
     Enum.find(hand, fn card -> card.id == card_id end)
   end
 
-  def deal(game) do
-    game =
-      Enum.reduce(
-        game.players,
-        game,
-        fn player, game ->
-          {hand, updated_deck} = Enum.split(game.deck, 5)
-          updated_hands = %{game.hands | player.name => hand}
-
-          %{game | hands: updated_hands, deck: updated_deck, started: true}
-        end
-      )
-
-    %{game | started: true, current_turn: Turn.new(Enum.random(game.players))}
-  end
-
   def game_state(game) do
     %{
       game_name: game.name,
@@ -155,12 +150,30 @@ defmodule MonobolyDeal.Game do
     Enum.find(game.players, fn p -> p.name == player.name end)
   end
 
+  def compare_players(%{name: name}, %{name: name}), do: true
+  def compare_players(%{name: p1}, %{name: p2}) when p1 != p2, do: false
+
   defp add_to_bank(%{bank: nil} = player, card) do
     %{player | bank: [card], bank_total: card.value}
   end
 
   defp add_to_bank(player, card) do
     %{player | bank: player.bank ++ [card], bank_total: player.bank_total + card.value}
+  end
+
+  defp add_cards_to_player_hand(game, player, cards) do
+    player_hand = get_hand(game, player)
+    updated_hands = %{game.hands | player.name => player_hand ++ cards}
+
+    %{name: name} = player
+
+    updated_players =
+      Enum.map(game.players, fn
+        %{name: ^name} -> %{player | hand: player.hand ++ cards}
+        other_player -> other_player
+      end)
+
+    %{game | players: updated_players, hands: updated_hands}
   end
 
   defp playing?(game, player) do
