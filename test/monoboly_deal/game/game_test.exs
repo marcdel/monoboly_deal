@@ -8,12 +8,9 @@ defmodule MonobolyDeal.GameTest do
   describe "creating a game" do
     test "sets the game name and adds the creator to the list of players" do
       game_name = NameGenerator.generate()
-      player = %{name: "player1"}
-
-      game = Game.new(game_name, player)
-
+      game = Game.new(game_name, "player1")
       assert game.name == game_name
-      assert game.players == [Game.find_player(game, player)]
+      assert game.players == [Game.find_player(game, %{name: "player1"})]
     end
 
     test "starts with an empty discard pile and a shuffled deck" do
@@ -28,11 +25,8 @@ defmodule MonobolyDeal.GameTest do
 
     test "starts with empty hands" do
       game_name = NameGenerator.generate()
-      player = %{name: "player1"}
-
-      game = Game.new(game_name, player)
-
-      assert Game.player_state(game, player).hand == []
+      game = Game.new(game_name, "player1")
+      assert Game.player_state(game, %{name: "player1"}).hand == []
     end
   end
 
@@ -42,7 +36,7 @@ defmodule MonobolyDeal.GameTest do
       player1 = Player.new("player1")
       player2 = Player.new("player2")
 
-      game = Game.new(game_name, player1)
+      game = Game.new(game_name, player1.name)
 
       %{
         game_name: game_name,
@@ -96,7 +90,7 @@ defmodule MonobolyDeal.GameTest do
       player1 = Player.new("player1")
       player2 = Player.new("player2")
 
-      game = Game.new(game_name, player1)
+      game = Game.new(game_name, player1.name)
       {:ok, game} = Game.join(game, player2)
 
       %{
@@ -145,7 +139,7 @@ defmodule MonobolyDeal.GameTest do
 
       game =
         game_name
-        |> Game.new(player1)
+        |> Game.new(player1.name)
         |> Game.join(player2)
         |> (fn {:ok, game} -> Game.deal(game) end).()
 
@@ -187,7 +181,7 @@ defmodule MonobolyDeal.GameTest do
 
       game =
         game_name
-        |> Game.new(player1)
+        |> Game.new("player1")
         |> Game.deal()
         |> Game.draw_cards(player1)
 
@@ -225,7 +219,7 @@ defmodule MonobolyDeal.GameTest do
 
       {game, card} =
         game_name
-        |> Game.new(player1)
+        |> Game.new(player1.name)
         |> Game.deal()
         |> Game.draw_cards(player1)
         |> (fn game ->
@@ -307,11 +301,10 @@ defmodule MonobolyDeal.GameTest do
 
   defp create_started_game do
     game_name = NameGenerator.generate()
-    player1 = Player.new("player1")
     player2 = Player.new("player2")
 
     game_name
-    |> Game.new(player1)
+    |> Game.new("player1")
     |> Game.join(player2)
     |> (fn {:ok, game} -> game end).()
     |> Game.deal()

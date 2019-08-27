@@ -14,10 +14,10 @@ defmodule MonobolyDeal.Game do
   alias MonobolyDeal.Game
   alias MonobolyDeal.Game.{Player, Turn}
 
-  def new(name, player) do
+  def new(game_name, player_name) do
     %Game{
-      name: name,
-      players: [Player.new(player.name)],
+      name: game_name,
+      players: [Player.new(player_name)],
       discard_pile: [],
       deck: Deck.new() |> Deck.shuffle(),
       started: false,
@@ -74,11 +74,11 @@ defmodule MonobolyDeal.Game do
     %{game | deck: updated_deck, current_turn: %{game.current_turn | drawn_cards: cards}}
   end
 
-  def choose_card(%{current_turn: %{drawn_cards: []}}, _, _), do: {:error, :draw_cards}
-
   def choose_card(%{current_turn: %{player: %{name: p1}}}, %{name: p2}, _) when p1 != p2 do
     {:error, :not_your_turn}
   end
+
+  def choose_card(%{current_turn: %{drawn_cards: []}}, _, _), do: {:error, :draw_cards}
 
   def choose_card(game, player, card_id) do
     card = Game.find_card(game, player, card_id)

@@ -15,7 +15,7 @@ defmodule MonobolyDealWeb.GameController do
     game_name = NameGenerator.generate()
     player = get_session(conn, :current_player)
 
-    case Supervisor.start_game(game_name, player) do
+    case Supervisor.start_game(game_name, player.name) do
       {:ok, _game_pid} ->
         redirect(conn, to: Routes.game_path(conn, :show, game_name))
 

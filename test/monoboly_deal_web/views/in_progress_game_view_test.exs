@@ -7,11 +7,8 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
 
   setup do
     game_name = NameGenerator.generate()
-    player = Player.new("player1")
-
-    Supervisor.start_game(game_name, player)
-
-    %{game_name: game_name, player: player}
+    Supervisor.start_game(game_name, "player1")
+    %{game_name: game_name, player: %{name: "player1"}}
   end
 
   describe "mount/2" do
