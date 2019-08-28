@@ -108,7 +108,7 @@ defmodule MonobolyDeal.Game do
   end
 
   def find_card(game, player, card_id) do
-    hand = Game.get_hand(game, player)
+    hand = Game.get_hand(game, player.name)
     Enum.find(hand, fn card -> card.id == card_id end)
   end
 
@@ -122,13 +122,12 @@ defmodule MonobolyDeal.Game do
   end
 
   def player_state(game, player_name) do
-    game
-    |> find_player(player_name)
-    |> build_player_state(game)
+    player = find_player(game, player_name)
+    build_player_state(game, player)
   end
 
-  def get_hand(game, player) do
-    find_player(game, player.name).hand
+  def get_hand(game, player_name) do
+    find_player(game, player_name).hand
   end
 
   def find_player(game, player_name) do
@@ -155,24 +154,24 @@ defmodule MonobolyDeal.Game do
     Enum.any?(game.players, fn p -> p.name == player_name end)
   end
 
-  defp build_player_state(nil, _), do: nil
+  defp build_player_state(_, nil), do: nil
 
-  defp build_player_state(player, %{current_turn: %{player: nil}} = game) do
+  defp build_player_state(%{current_turn: %{player: nil}} = game, player) do
     %{
       name: player.name,
       bank: player.bank,
       bank_total: player.bank_total,
-      hand: get_hand(game, player),
+      hand: get_hand(game, player.name),
       my_turn: false
     }
   end
 
-  defp build_player_state(player, game) do
+  defp build_player_state(game, player) do
     %{
       name: player.name,
       bank: player.bank,
       bank_total: player.bank_total,
-      hand: get_hand(game, player),
+      hand: get_hand(game, player.name),
       my_turn: game.current_turn.player == player
     }
   end

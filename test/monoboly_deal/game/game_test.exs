@@ -3,7 +3,7 @@ defmodule MonobolyDeal.GameTest do
 
   alias MonobolyDeal.Deck
   alias MonobolyDeal.Game
-  alias MonobolyDeal.Game.{NameGenerator, Player}
+  alias MonobolyDeal.Game.NameGenerator
 
   describe "creating a game" do
     test "sets the game name and adds the creator to the list of players" do
@@ -164,7 +164,7 @@ defmodule MonobolyDeal.GameTest do
     end
 
     test "sets the chosen card in the current turn", %{game: game} do
-      [card | _] = Game.get_hand(game, %{name: "player1"})
+      [card | _] = Game.get_hand(game, "player1")
 
       {:ok, game} = Game.choose_card(game, "player1", card.id)
 
@@ -176,15 +176,13 @@ defmodule MonobolyDeal.GameTest do
 
   describe "placing a card in your bank" do
     setup do
-      player1 = Player.new("player1")
-
       {game, card} =
         NameGenerator.generate()
         |> Game.new("player1")
         |> Game.deal()
         |> Game.draw_cards("player1")
         |> (fn game ->
-              [card | _] = Game.get_hand(game, player1)
+              [card | _] = Game.get_hand(game, "player1")
               {:ok, game} = Game.choose_card(game, "player1", card.id)
               {game, card}
             end).()
@@ -249,7 +247,7 @@ defmodule MonobolyDeal.GameTest do
     test "returns the hand of the specified player" do
       hand =
         create_started_game()
-        |> Game.get_hand(%{name: "player2"})
+        |> Game.get_hand("player2")
 
       assert Enum.count(hand) == 5
     end
