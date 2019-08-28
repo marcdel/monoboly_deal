@@ -116,7 +116,7 @@ defmodule MonobolyDeal.GameTest do
     end
 
     test "draws two cards into the player's hand", %{game: game} do
-      game = Game.draw_cards(game, game.current_turn.player)
+      game = Game.draw_cards(game, game.current_turn.player.name)
       assert Enum.count(Game.player_state(game, game.current_turn.player).hand) == 7
       assert Enum.count(Game.game_state(game).current_turn.drawn_cards) == 2
     end
@@ -124,16 +124,16 @@ defmodule MonobolyDeal.GameTest do
     test "does nothing when not your turn", %{game: game} do
       wrong_player =
         if Game.compare_players(game.current_turn.player, %{name: "player1"}),
-          do: %{name: "player2"},
-          else: %{name: "player1"}
+          do: "player2",
+          else: "player1"
 
       game = Game.draw_cards(game, wrong_player)
-      assert Enum.count(Game.player_state(game, wrong_player).hand) == 5
+      assert Enum.count(Game.player_state(game, %{name: wrong_player}).hand) == 5
     end
 
     test "does nothing if you've already drawn 2 cards", %{game: game} do
-      game = Game.draw_cards(game, game.current_turn.player)
-      game = Game.draw_cards(game, game.current_turn.player)
+      game = Game.draw_cards(game, game.current_turn.player.name)
+      game = Game.draw_cards(game, game.current_turn.player.name)
 
       assert Enum.count(Game.player_state(game, game.current_turn.player).hand) == 7
       assert Enum.count(Game.game_state(game).current_turn.drawn_cards) == 2
@@ -143,13 +143,12 @@ defmodule MonobolyDeal.GameTest do
   describe "choosing a card" do
     setup do
       game_name = NameGenerator.generate()
-      player1 = Player.new("player1")
 
       game =
         game_name
         |> Game.new("player1")
         |> Game.deal()
-        |> Game.draw_cards(player1)
+        |> Game.draw_cards("player1")
 
       %{game: game, player1: Game.find_player(game, "player1")}
     end
@@ -184,7 +183,7 @@ defmodule MonobolyDeal.GameTest do
         game_name
         |> Game.new("player1")
         |> Game.deal()
-        |> Game.draw_cards(player1)
+        |> Game.draw_cards("player1")
         |> (fn game ->
               [card | _] = Game.get_hand(game, player1)
               {:ok, game} = Game.choose_card(game, player1, card.id)

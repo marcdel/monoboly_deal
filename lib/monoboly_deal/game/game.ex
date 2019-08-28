@@ -49,7 +49,7 @@ defmodule MonobolyDeal.Game do
         game,
         fn player, game ->
           {hand, updated_deck} = Enum.split(game.deck, 5)
-          game = add_cards_to_player_hand(game, player, hand)
+          game = add_cards_to_player_hand(game, player.name, hand)
 
           %{game | deck: updated_deck, started: true}
         end
@@ -58,19 +58,19 @@ defmodule MonobolyDeal.Game do
     %{game | started: true, current_turn: Turn.new(Enum.random(game.players))}
   end
 
-  def draw_cards(%{current_turn: %{player: %{name: p1}}} = game, %{name: p2}) when p1 != p2 do
-    #    IO.inspect({:error, :not_your_turn})
+  def draw_cards(%{current_turn: %{player: %{name: p1}}} = game, p2) when p1 != p2 do
+    # IO.inspect({:error, :not_your_turn})
     game
   end
 
   def draw_cards(%{current_turn: %{drawn_cards: [_, _]}} = game, _) do
-    #    IO.inspect({:error, :already_drawn_cards})
+    # IO.inspect({:error, :already_drawn_cards})
     game
   end
 
-  def draw_cards(game, player) do
+  def draw_cards(game, player_name) do
     {cards, updated_deck} = Enum.split(game.deck, 2)
-    game = add_cards_to_player_hand(game, player, cards)
+    game = add_cards_to_player_hand(game, player_name, cards)
     %{game | deck: updated_deck, current_turn: %{game.current_turn | drawn_cards: cards}}
   end
 
@@ -138,8 +138,8 @@ defmodule MonobolyDeal.Game do
   def compare_players(%{name: name}, %{name: name}), do: true
   def compare_players(%{name: p1}, %{name: p2}) when p1 != p2, do: false
 
-  defp add_cards_to_player_hand(game, player, cards) do
-    player = find_player(game, player.name)
+  defp add_cards_to_player_hand(game, player_name, cards) do
+    player = find_player(game, player_name)
     %{name: name} = player
 
     updated_players =
