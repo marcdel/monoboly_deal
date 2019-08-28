@@ -124,7 +124,7 @@ defmodule MonobolyDeal.GameTest do
 
     test "does nothing when not your turn", %{game: game} do
       wrong_player =
-        if Game.compare_players(game.current_turn.player, %{name: "player1"}),
+        if Game.whose_turn(game) == "player1",
           do: "player2",
           else: "player1"
 
@@ -133,10 +133,10 @@ defmodule MonobolyDeal.GameTest do
     end
 
     test "does nothing if you've already drawn 2 cards", %{game: game} do
-      game = Game.draw_cards(game, game.current_turn.player.name)
-      game = Game.draw_cards(game, game.current_turn.player.name)
+      game = Game.draw_cards(game, Game.whose_turn(game))
+      game = Game.draw_cards(game, Game.whose_turn(game))
 
-      assert Enum.count(Game.player_state(game, game.current_turn.player.name).hand) == 7
+      assert Enum.count(Game.player_state(game, Game.whose_turn(game)).hand) == 7
       assert Enum.count(Game.game_state(game).current_turn.drawn_cards) == 2
     end
   end
@@ -168,7 +168,7 @@ defmodule MonobolyDeal.GameTest do
 
       {:ok, game} = Game.choose_card(game, "player1", card.id)
 
-      assert game.current_turn.player.name == "player1"
+      assert Game.whose_turn(game) == "player1"
       assert game.current_turn.chosen_card == card
       assert [_, _] = game.current_turn.drawn_cards
     end

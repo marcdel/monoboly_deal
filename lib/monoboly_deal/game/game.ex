@@ -133,8 +133,11 @@ defmodule MonobolyDeal.Game do
     Enum.find(game.players, fn p -> p.name == player_name end)
   end
 
-  def compare_players(%{name: name}, %{name: name}), do: true
-  def compare_players(%{name: p1}, %{name: p2}) when p1 != p2, do: false
+  def whose_turn(%{current_turn: %{player: nil}}), do: ""
+
+  def whose_turn(game) do
+    game.current_turn.player.name
+  end
 
   defp add_cards_to_player_hand(game, player_name, cards) do
     player = find_player(game, player_name)
