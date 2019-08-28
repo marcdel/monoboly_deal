@@ -10,7 +10,7 @@ defmodule MonobolyDeal.GameTest do
       game_name = NameGenerator.generate()
       game = Game.new(game_name, "player1")
       assert game.name == game_name
-      assert game.players == [Game.find_player(game, %{name: "player1"})]
+      assert game.players == [Game.find_player(game, "player1")]
     end
 
     test "starts with an empty discard pile and a shuffled deck" do
@@ -88,8 +88,8 @@ defmodule MonobolyDeal.GameTest do
 
     test "each player is dealt a hand of 5 cards", %{game: game} do
       game = Game.deal(game)
-      assert Enum.count(Game.find_player(game, %{name: "player1"}).hand) == 5
-      assert Enum.count(Game.find_player(game, %{name: "player2"}).hand) == 5
+      assert Enum.count(Game.find_player(game, "player1").hand) == 5
+      assert Enum.count(Game.find_player(game, "player2").hand) == 5
     end
 
     test "dealt cards are removed from the deck", %{game: game} do
@@ -151,7 +151,7 @@ defmodule MonobolyDeal.GameTest do
         |> Game.deal()
         |> Game.draw_cards(player1)
 
-      %{game: game, player1: Game.find_player(game, player1)}
+      %{game: game, player1: Game.find_player(game, "player1")}
     end
 
     test "must be player's turn", %{game: game} do

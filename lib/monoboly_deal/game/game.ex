@@ -123,23 +123,23 @@ defmodule MonobolyDeal.Game do
 
   def player_state(game, player) do
     game
-    |> find_player(player)
+    |> find_player(player.name)
     |> build_player_state(game)
   end
 
   def get_hand(game, player) do
-    find_player(game, player).hand
+    find_player(game, player.name).hand
   end
 
-  def find_player(game, player) do
-    Enum.find(game.players, fn p -> p.name == player.name end)
+  def find_player(game, player_name) do
+    Enum.find(game.players, fn p -> p.name == player_name end)
   end
 
   def compare_players(%{name: name}, %{name: name}), do: true
   def compare_players(%{name: p1}, %{name: p2}) when p1 != p2, do: false
 
   defp add_cards_to_player_hand(game, player, cards) do
-    player = find_player(game, player)
+    player = find_player(game, player.name)
     %{name: name} = player
 
     updated_players =

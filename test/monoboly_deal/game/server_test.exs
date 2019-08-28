@@ -11,7 +11,7 @@ defmodule MonobolyDeal.Game.ServerTest do
 
     game = :sys.get_state(pid)
     assert game.name == game_name
-    assert Game.find_player(game, %{name: "player1"})
+    assert Game.find_player(game, "player1")
     assert game.discard_pile == []
     assert Enum.count(game.deck) == 106
   end
@@ -76,7 +76,7 @@ defmodule MonobolyDeal.Game.ServerTest do
       game_name = NameGenerator.generate()
       {:ok, _pid} = Server.start_link(game_name, "player1")
 
-      assert Server.playing?(game_name, %{name: "player1"}) == {:ok, true}
+      assert Server.playing?(game_name, "player1") == {:ok, true}
     end
 
     test "returns false when player not found" do

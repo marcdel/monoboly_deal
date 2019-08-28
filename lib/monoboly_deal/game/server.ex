@@ -14,8 +14,8 @@ defmodule MonobolyDeal.Game.Server do
     GenServer.call(via_tuple(game_name), {:join, player_name})
   end
 
-  def playing?(game_name, player) do
-    GenServer.call(via_tuple(game_name), {:playing?, player})
+  def playing?(game_name, player_name) do
+    GenServer.call(via_tuple(game_name), {:playing?, player_name})
   end
 
   def deal_hand(game_name) do
@@ -111,8 +111,8 @@ defmodule MonobolyDeal.Game.Server do
     end
   end
 
-  def handle_call({:playing?, player}, _from, game) do
-    case Game.find_player(game, player) do
+  def handle_call({:playing?, player_name}, _from, game) do
+    case Game.find_player(game, player_name) do
       nil -> {:reply, {:ok, false}, game, @timeout}
       _ -> {:reply, {:ok, true}, game, @timeout}
     end
