@@ -205,7 +205,7 @@ defmodule MonobolyDeal.GameTest do
 
       assert player_state.bank == [card]
       assert player_state.bank_total == card.value
-      assert Game.find_card(game, %{name: "player1"}, card.id) == nil
+      assert Game.find_card(game, "player1", card.id) == nil
       assert game.current_turn.chosen_card == nil
     end
   end

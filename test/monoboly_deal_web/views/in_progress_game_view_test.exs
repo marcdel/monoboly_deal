@@ -2,7 +2,7 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
   use MonobolyDealWeb.ConnCase, async: true
   import Phoenix.LiveViewTest, only: [mount: 3, render_click: 2, render_click: 3]
 
-  alias MonobolyDeal.Game.{NameGenerator, Player, Server, Supervisor}
+  alias MonobolyDeal.Game.{NameGenerator, Server, Supervisor}
   alias MonobolyDealWeb.{Endpoint, InProgressGameView}
 
   setup do
@@ -21,12 +21,11 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
     end
 
     test "joins the game if not already playing", %{game_name: game_name} do
-      player2 = Player.new("player2")
-      player2_session = %{game_name: game_name, current_player: player2}
+      player2_session = %{game_name: game_name, current_player: %{name: "player2"}}
       {:ok, _view, html} = mount(Endpoint, InProgressGameView, session: player2_session)
       assert html =~ game_name
       assert html =~ "player1"
-      assert html =~ player2.name
+      assert html =~ "player2"
     end
 
     test "redirects if not joined and game has already started", %{game_name: game_name} do
@@ -40,8 +39,7 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
 
   describe "deal-hand" do
     test "deals a hand to each player and updates player and game state", %{game_name: game_name} do
-      player2 = Player.new("player2")
-      player2_session = %{game_name: game_name, current_player: player2}
+      player2_session = %{game_name: game_name, current_player: %{name: "player2"}}
       {:ok, view, _html} = mount(Endpoint, InProgressGameView, session: player2_session)
 
       html = render_click(view, "deal-hand")

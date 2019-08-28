@@ -81,8 +81,7 @@ defmodule MonobolyDeal.Game do
   def choose_card(%{current_turn: %{drawn_cards: []}}, _, _), do: {:error, :draw_cards}
 
   def choose_card(game, player_name, card_id) do
-    player = find_player(game, player_name)
-    card = Game.find_card(game, player, card_id)
+    card = Game.find_card(game, player_name, card_id)
     {:ok, %{game | current_turn: %{game.current_turn | chosen_card: card}}}
   end
 
@@ -107,8 +106,8 @@ defmodule MonobolyDeal.Game do
      %{game | players: updated_players, current_turn: %{game.current_turn | chosen_card: nil}}}
   end
 
-  def find_card(game, player, card_id) do
-    hand = Game.get_hand(game, player.name)
+  def find_card(game, player_name, card_id) do
+    hand = Game.get_hand(game, player_name)
     Enum.find(hand, fn card -> card.id == card_id end)
   end
 

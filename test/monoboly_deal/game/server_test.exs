@@ -2,7 +2,7 @@ defmodule MonobolyDeal.Game.ServerTest do
   use ExUnit.Case, async: true
 
   alias MonobolyDeal.Game
-  alias MonobolyDeal.Game.{NameGenerator, Player, Server}
+  alias MonobolyDeal.Game.{NameGenerator, Server}
 
   test "spawning a game server process" do
     game_name = NameGenerator.generate()
@@ -26,9 +26,8 @@ defmodule MonobolyDeal.Game.ServerTest do
   describe "game_pid" do
     test "returns a PID if it has been registered" do
       game_name = NameGenerator.generate()
-      player = Player.new("player1")
 
-      {:ok, pid} = Server.start_link(game_name, player)
+      {:ok, pid} = Server.start_link(game_name, %{name: "player1"})
 
       assert ^pid = Server.game_pid(game_name)
     end
@@ -62,8 +61,7 @@ defmodule MonobolyDeal.Game.ServerTest do
       {:ok, _pid} = Server.start_link(game_name, "player1")
       {:ok, _} = Server.deal_hand(game_name)
 
-      player2 = Player.new("player2")
-      {:error, error} = Server.join(game_name, player2)
+      {:error, error} = Server.join(game_name, "player2")
 
       game_state = Server.game_state(game_name)
       assert [%{name: "player1"}] = game_state.players
@@ -81,11 +79,8 @@ defmodule MonobolyDeal.Game.ServerTest do
 
     test "returns false when player not found" do
       game_name = NameGenerator.generate()
-      player1 = Player.new("player1")
-      player2 = Player.new("player2")
-      {:ok, _pid} = Server.start_link(game_name, player1)
-
-      assert Server.playing?(game_name, player2) == {:ok, false}
+      {:ok, _pid} = Server.start_link(game_name, "player1")
+      assert Server.playing?(game_name, "player2") == {:ok, false}
     end
   end
 
