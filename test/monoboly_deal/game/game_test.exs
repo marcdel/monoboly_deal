@@ -150,25 +150,24 @@ defmodule MonobolyDeal.GameTest do
         |> Game.deal()
         |> Game.draw_cards("player1")
 
-      %{game: game, player1: Game.find_player(game, "player1")}
+      %{game: game}
     end
 
     test "must be player's turn", %{game: game} do
-      player2 = Player.new("player2")
-      {:error, :not_your_turn} = Game.choose_card(game, player2, "the card id")
+      {:error, :not_your_turn} = Game.choose_card(game, "player2", "the card id")
     end
 
-    test "must draw 2 cards before playing cards from your hand", %{game: game, player1: player1} do
+    test "must draw 2 cards before playing cards from your hand", %{game: game} do
       game = %{game | current_turn: %{game.current_turn | drawn_cards: []}}
-      {:error, :draw_cards} = Game.choose_card(game, player1, "the card id")
+      {:error, :draw_cards} = Game.choose_card(game, "player1", "the card id")
     end
 
-    test "sets the chosen card in the current turn", %{game: game, player1: player1} do
-      [card | _] = Game.get_hand(game, player1)
+    test "sets the chosen card in the current turn", %{game: game} do
+      [card | _] = Game.get_hand(game, %{name: "player1"})
 
-      {:ok, game} = Game.choose_card(game, player1, card.id)
+      {:ok, game} = Game.choose_card(game, "player1", card.id)
 
-      assert game.current_turn.player.name == player1.name
+      assert game.current_turn.player.name == "player1"
       assert game.current_turn.chosen_card == card
       assert [_, _] = game.current_turn.drawn_cards
     end
@@ -186,7 +185,7 @@ defmodule MonobolyDeal.GameTest do
         |> Game.draw_cards("player1")
         |> (fn game ->
               [card | _] = Game.get_hand(game, player1)
-              {:ok, game} = Game.choose_card(game, player1, card.id)
+              {:ok, game} = Game.choose_card(game, "player1", card.id)
               {game, card}
             end).()
 

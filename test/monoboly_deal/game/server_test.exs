@@ -157,7 +157,7 @@ defmodule MonobolyDeal.Game.ServerTest do
       Server.draw_cards(game_name, "player1")
       [card | _] = Server.get_hand(game_name, player)
 
-      {:ok, game} = Server.choose_card(game_name, player, card.id)
+      {:ok, game} = Server.choose_card(game_name, "player1", card.id)
 
       assert game.current_turn.chosen_card == card
     end
@@ -172,7 +172,7 @@ defmodule MonobolyDeal.Game.ServerTest do
       Server.draw_cards(game_name, "player1")
       [card | _] = Server.get_hand(game_name, player)
 
-      {:ok, _} = Server.choose_card(game_name, player, card.id)
+      {:ok, _} = Server.choose_card(game_name, "player1", card.id)
       {:ok, game} = Server.place_card_bank(game_name, player)
 
       assert game.current_turn.chosen_card == nil

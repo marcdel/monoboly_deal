@@ -74,13 +74,14 @@ defmodule MonobolyDeal.Game do
     %{game | deck: updated_deck, current_turn: %{game.current_turn | drawn_cards: cards}}
   end
 
-  def choose_card(%{current_turn: %{player: %{name: p1}}}, %{name: p2}, _) when p1 != p2 do
+  def choose_card(%{current_turn: %{player: %{name: p1}}}, p2, _) when p1 != p2 do
     {:error, :not_your_turn}
   end
 
   def choose_card(%{current_turn: %{drawn_cards: []}}, _, _), do: {:error, :draw_cards}
 
-  def choose_card(game, player, card_id) do
+  def choose_card(game, player_name, card_id) do
+    player = find_player(game, player_name)
     card = Game.find_card(game, player, card_id)
     {:ok, %{game | current_turn: %{game.current_turn | chosen_card: card}}}
   end

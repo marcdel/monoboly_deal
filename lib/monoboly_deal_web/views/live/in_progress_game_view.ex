@@ -50,7 +50,7 @@ defmodule MonobolyDealWeb.InProgressGameView do
   def handle_event("choose-card", card_id, socket) do
     %{game_name: game_name, current_player: current_player} = socket.assigns
 
-    case Server.choose_card(game_name, current_player, card_id) do
+    case Server.choose_card(game_name, current_player.name, card_id) do
       {:ok, _} ->
         {:noreply, update_state(socket)}
 
