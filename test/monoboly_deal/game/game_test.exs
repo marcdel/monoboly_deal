@@ -24,7 +24,7 @@ defmodule MonobolyDeal.GameTest do
     test "starts with empty hands" do
       game_name = NameGenerator.generate()
       game = Game.new(game_name, "player1")
-      assert Game.player_state(game, %{name: "player1"}).hand == []
+      assert Game.player_state(game, "player1").hand == []
     end
   end
 
@@ -116,8 +116,9 @@ defmodule MonobolyDeal.GameTest do
     end
 
     test "draws two cards into the player's hand", %{game: game} do
-      game = Game.draw_cards(game, game.current_turn.player.name)
-      assert Enum.count(Game.player_state(game, game.current_turn.player).hand) == 7
+      %{name: name} = game.current_turn.player
+      game = Game.draw_cards(game, name)
+      assert Enum.count(Game.player_state(game, name).hand) == 7
       assert Enum.count(Game.game_state(game).current_turn.drawn_cards) == 2
     end
 
@@ -128,14 +129,14 @@ defmodule MonobolyDeal.GameTest do
           else: "player1"
 
       game = Game.draw_cards(game, wrong_player)
-      assert Enum.count(Game.player_state(game, %{name: wrong_player}).hand) == 5
+      assert Enum.count(Game.player_state(game, wrong_player).hand) == 5
     end
 
     test "does nothing if you've already drawn 2 cards", %{game: game} do
       game = Game.draw_cards(game, game.current_turn.player.name)
       game = Game.draw_cards(game, game.current_turn.player.name)
 
-      assert Enum.count(Game.player_state(game, game.current_turn.player).hand) == 7
+      assert Enum.count(Game.player_state(game, game.current_turn.player.name).hand) == 7
       assert Enum.count(Game.game_state(game).current_turn.drawn_cards) == 2
     end
   end
@@ -202,7 +203,7 @@ defmodule MonobolyDeal.GameTest do
 
     test "moves the chosen card to your bank", %{game: game, card: card} do
       {:ok, game} = Game.place_card_bank(game, "player1")
-      player_state = Game.player_state(game, %{name: "player1"})
+      player_state = Game.player_state(game, "player1")
 
       assert player_state.bank == [card]
       assert player_state.bank_total == card.value
@@ -229,7 +230,7 @@ defmodule MonobolyDeal.GameTest do
     test "returns the player state for the current player" do
       player_state =
         create_started_game()
-        |> Game.player_state(%{name: "player2"})
+        |> Game.player_state("player2")
 
       assert player_state.name == "player2"
       assert Enum.count(player_state.hand) == 5

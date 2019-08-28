@@ -121,9 +121,9 @@ defmodule MonobolyDeal.Game do
     }
   end
 
-  def player_state(game, player) do
+  def player_state(game, player_name) do
     game
-    |> find_player(player.name)
+    |> find_player(player_name)
     |> build_player_state(game)
   end
 
