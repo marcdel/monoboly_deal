@@ -90,17 +90,16 @@ defmodule MonobolyDeal.Game do
     {:error, :choose_card}
   end
 
-  def place_card_bank(%{current_turn: %{player: %{name: p1}}}, %{name: p2}) when p1 != p2 do
+  def place_card_bank(%{current_turn: %{player: %{name: p1}}}, p2) when p1 != p2 do
     {:error, :not_your_turn}
   end
 
-  def place_card_bank(game, player) do
-    %{name: name} = player
+  def place_card_bank(game, player_name) do
     card = game.current_turn.chosen_card
 
     updated_players =
       Enum.map(game.players, fn
-        %{name: ^name} = found_player -> Player.add_to_bank(found_player, card)
+        %{name: ^player_name} = found_player -> Player.add_to_bank(found_player, card)
         other_player -> other_player
       end)
 

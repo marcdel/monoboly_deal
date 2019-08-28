@@ -30,8 +30,8 @@ defmodule MonobolyDeal.Game.Server do
     GenServer.call(via_tuple(game_name), {:choose_card, player_name, card_id})
   end
 
-  def place_card_bank(game_name, player) do
-    GenServer.call(via_tuple(game_name), {:place_card_bank, player})
+  def place_card_bank(game_name, player_name) do
+    GenServer.call(via_tuple(game_name), {:place_card_bank, player_name})
   end
 
   def game_state(game_name) do
@@ -91,8 +91,8 @@ defmodule MonobolyDeal.Game.Server do
     end
   end
 
-  def handle_call({:place_card_bank, player}, _from, game) do
-    case Game.place_card_bank(game, player) do
+  def handle_call({:place_card_bank, player_name}, _from, game) do
+    case Game.place_card_bank(game, player_name) do
       {:ok, updated_game} ->
         {:reply, {:ok, updated_game}, updated_game, @timeout}
 

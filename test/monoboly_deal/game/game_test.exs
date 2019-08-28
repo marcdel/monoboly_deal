@@ -175,11 +175,10 @@ defmodule MonobolyDeal.GameTest do
 
   describe "placing a card in your bank" do
     setup do
-      game_name = NameGenerator.generate()
       player1 = Player.new("player1")
 
       {game, card} =
-        game_name
+        NameGenerator.generate()
         |> Game.new("player1")
         |> Game.deal()
         |> Game.draw_cards("player1")
@@ -189,30 +188,25 @@ defmodule MonobolyDeal.GameTest do
               {game, card}
             end).()
 
-      %{
-        game: game,
-        card: card,
-        player1: player1
-      }
+      %{game: game, card: card}
     end
 
     test "must be player's turn", %{game: game} do
-      player2 = Player.new("player2")
-      {:error, :not_your_turn} = Game.place_card_bank(game, player2)
+      {:error, :not_your_turn} = Game.place_card_bank(game, "player2")
     end
 
-    test "must have chosen a card", %{game: game, player1: player1} do
+    test "must have chosen a card", %{game: game} do
       game = %{game | current_turn: %{game.current_turn | chosen_card: nil}}
-      {:error, :choose_card} = Game.place_card_bank(game, player1)
+      {:error, :choose_card} = Game.place_card_bank(game, "player1")
     end
 
-    test "moves the chosen card to your bank", %{game: game, card: card, player1: player1} do
-      {:ok, game} = Game.place_card_bank(game, player1)
-      player_state = Game.player_state(game, player1)
+    test "moves the chosen card to your bank", %{game: game, card: card} do
+      {:ok, game} = Game.place_card_bank(game, "player1")
+      player_state = Game.player_state(game, %{name: "player1"})
 
       assert player_state.bank == [card]
       assert player_state.bank_total == card.value
-      assert Game.find_card(game, player1, card.id) == nil
+      assert Game.find_card(game, %{name: "player1"}, card.id) == nil
       assert game.current_turn.chosen_card == nil
     end
   end
