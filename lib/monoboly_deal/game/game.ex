@@ -25,17 +25,17 @@ defmodule MonobolyDeal.Game do
     }
   end
 
-  def join(%{started: true} = game, player) do
-    case playing?(game, player) do
+  def join(%{started: true} = game, player_name) do
+    case playing?(game, player_name) do
       false -> {:error, %{error: :game_started, message: "Oops! This game has already started."}}
       true -> {:ok, game}
     end
   end
 
-  def join(game, player) do
-    case playing?(game, player) do
+  def join(game, player_name) do
+    case playing?(game, player_name) do
       false ->
-        {:ok, %{game | players: game.players ++ [player]}}
+        {:ok, %{game | players: game.players ++ [Player.new(player_name)]}}
 
       true ->
         {:ok, game}
@@ -151,8 +151,8 @@ defmodule MonobolyDeal.Game do
     %{game | players: updated_players}
   end
 
-  defp playing?(game, player) do
-    Enum.any?(game.players, fn p -> p.name == player.name end)
+  defp playing?(game, player_name) do
+    Enum.any?(game.players, fn p -> p.name == player_name end)
   end
 
   defp build_player_state(nil, _), do: nil

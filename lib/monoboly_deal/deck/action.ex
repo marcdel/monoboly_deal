@@ -3,6 +3,7 @@ defmodule MonobolyDeal.Deck.Action do
 
   defstruct [:id, :name, :type, :value, :image_url]
 
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def new(type) do
     case type do
       :deal_breaker ->

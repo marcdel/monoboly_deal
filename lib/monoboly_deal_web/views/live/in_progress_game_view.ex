@@ -11,7 +11,7 @@ defmodule MonobolyDealWeb.InProgressGameView do
   def mount(%{game_name: game_name, current_player: current_player}, socket) do
     if connected?(socket), do: :timer.send_interval(100, self(), :tick)
 
-    case Server.join(game_name, current_player) do
+    case Server.join(game_name, current_player.name) do
       {:ok, _} ->
         socket =
           socket

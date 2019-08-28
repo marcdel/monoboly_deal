@@ -15,9 +15,7 @@ defmodule MonobolyDeal.GameTest do
 
     test "starts with an empty discard pile and a shuffled deck" do
       game_name = NameGenerator.generate()
-      player = %{name: "player1"}
-
-      game = Game.new(game_name, player)
+      game = Game.new(game_name, "player1")
 
       assert game.discard_pile == []
       assert Enum.count(game.deck) == Enum.count(Deck.new())
@@ -32,49 +30,35 @@ defmodule MonobolyDeal.GameTest do
 
   describe "join/2" do
     setup do
-      game_name = NameGenerator.generate()
-      player1 = Player.new("player1")
-      player2 = Player.new("player2")
-
-      game = Game.new(game_name, player1.name)
-
-      %{
-        game_name: game_name,
-        game: game,
-        player1: player1,
-        player2: player2
-      }
+      game = Game.new(NameGenerator.generate(), "player1")
+      %{game: game}
     end
 
-    test "adds the player to the game", %{game: game, player1: player1, player2: player2} do
-      {:ok, game} = Game.join(game, player2)
-
-      assert game.players == [player1, player2]
+    test "adds the player to the game", %{game: game} do
+      {:ok, game} = Game.join(game, "player2")
+      assert [%{name: "player1"}, %{name: "player2"}] = game.players
     end
 
-    test "does not re-add a player that has already joined", %{game: game, player1: player1} do
-      {:ok, game} = Game.join(game, player1)
+    test "does not re-add a player that has already joined", %{game: game} do
+      {:ok, game} = Game.join(game, "player1")
 
       assert Enum.count(game.players) == 1
       assert [%{name: "player1"}] = game.players
     end
 
-    test "player can rejoin a game that has already started", %{game: game, player1: player1} do
+    test "player can rejoin a game that has already started", %{game: game} do
       game = Game.deal(game)
 
-      {:ok, game} = Game.join(game, player1)
+      {:ok, game} = Game.join(game, "player1")
 
       assert Enum.count(game.players) == 1
       assert [%{name: "player1"}] = game.players
     end
 
-    test "returns an error when new player joins an in progress game", %{
-      game: game,
-      player2: player2
-    } do
+    test "returns an error when new player joins an in progress game", %{game: game} do
       game = Game.deal(game)
 
-      {:error, error} = Game.join(game, player2)
+      {:error, error} = Game.join(game, "player2")
 
       assert error == %{error: :game_started, message: "Oops! This game has already started."}
 
@@ -86,19 +70,12 @@ defmodule MonobolyDeal.GameTest do
 
   describe "dealing a hand" do
     setup do
-      game_name = NameGenerator.generate()
-      player1 = Player.new("player1")
-      player2 = Player.new("player2")
+      {:ok, game} =
+        NameGenerator.generate()
+        |> Game.new("player1")
+        |> Game.join("player2")
 
-      game = Game.new(game_name, player1.name)
-      {:ok, game} = Game.join(game, player2)
-
-      %{
-        game_name: game_name,
-        game: game,
-        player1: player1,
-        player2: player2
-      }
+      %{game: game}
     end
 
     test "the game is not started until a hand is dealt", %{game: game} do
@@ -109,14 +86,10 @@ defmodule MonobolyDeal.GameTest do
       assert game.started == true
     end
 
-    test "each player is dealt a hand of 5 cards", %{
-      game: game,
-      player1: player1,
-      player2: player2
-    } do
+    test "each player is dealt a hand of 5 cards", %{game: game} do
       game = Game.deal(game)
-      assert Enum.count(Game.find_player(game, player1).hand) == 5
-      assert Enum.count(Game.find_player(game, player2).hand) == 5
+      assert Enum.count(Game.find_player(game, %{name: "player1"}).hand) == 5
+      assert Enum.count(Game.find_player(game, %{name: "player2"}).hand) == 5
     end
 
     test "dealt cards are removed from the deck", %{game: game} do
@@ -133,22 +106,13 @@ defmodule MonobolyDeal.GameTest do
 
   describe "drawing cards" do
     setup do
-      game_name = NameGenerator.generate()
-      player1 = Player.new("player1")
-      player2 = Player.new("player2")
-
       game =
-        game_name
-        |> Game.new(player1.name)
-        |> Game.join(player2)
+        NameGenerator.generate()
+        |> Game.new("player1")
+        |> Game.join("player2")
         |> (fn {:ok, game} -> Game.deal(game) end).()
 
-      %{
-        game_name: game_name,
-        game: game,
-        player1: player1,
-        player2: player2
-      }
+      %{game: game}
     end
 
     test "draws two cards into the player's hand", %{game: game} do
@@ -157,9 +121,11 @@ defmodule MonobolyDeal.GameTest do
       assert Enum.count(Game.game_state(game).current_turn.drawn_cards) == 2
     end
 
-    test "does nothing when not your turn", %{game: game, player1: player1, player2: player2} do
+    test "does nothing when not your turn", %{game: game} do
       wrong_player =
-        if Game.compare_players(game.current_turn.player, player1), do: player2, else: player1
+        if Game.compare_players(game.current_turn.player, %{name: "player1"}),
+          do: %{name: "player2"},
+          else: %{name: "player1"}
 
       game = Game.draw_cards(game, wrong_player)
       assert Enum.count(Game.player_state(game, wrong_player).hand) == 5
@@ -185,10 +151,7 @@ defmodule MonobolyDeal.GameTest do
         |> Game.deal()
         |> Game.draw_cards(player1)
 
-      %{
-        game: game,
-        player1: Game.find_player(game, player1)
-      }
+      %{game: game, player1: Game.find_player(game, player1)}
     end
 
     test "must be player's turn", %{game: game} do
@@ -219,7 +182,7 @@ defmodule MonobolyDeal.GameTest do
 
       {game, card} =
         game_name
-        |> Game.new(player1.name)
+        |> Game.new("player1")
         |> Game.deal()
         |> Game.draw_cards(player1)
         |> (fn game ->
@@ -300,12 +263,9 @@ defmodule MonobolyDeal.GameTest do
   end
 
   defp create_started_game do
-    game_name = NameGenerator.generate()
-    player2 = Player.new("player2")
-
-    game_name
+    NameGenerator.generate()
     |> Game.new("player1")
-    |> Game.join(player2)
+    |> Game.join("player2")
     |> (fn {:ok, game} -> game end).()
     |> Game.deal()
   end

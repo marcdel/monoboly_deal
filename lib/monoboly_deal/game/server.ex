@@ -10,8 +10,8 @@ defmodule MonobolyDeal.Game.Server do
     GenServer.start_link(__MODULE__, {game_name, player_name}, name: via_tuple(game_name))
   end
 
-  def join(game_name, player) do
-    GenServer.call(via_tuple(game_name), {:join, player})
+  def join(game_name, player_name) do
+    GenServer.call(via_tuple(game_name), {:join, player_name})
   end
 
   def playing?(game_name, player) do
@@ -101,8 +101,8 @@ defmodule MonobolyDeal.Game.Server do
     end
   end
 
-  def handle_call({:join, player}, _from, game) do
-    case Game.join(game, player) do
+  def handle_call({:join, player_name}, _from, game) do
+    case Game.join(game, player_name) do
       {:ok, updated_game} ->
         {:reply, {:ok, Game.game_state(updated_game)}, updated_game, @timeout}
 

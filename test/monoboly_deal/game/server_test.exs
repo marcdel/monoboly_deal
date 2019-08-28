@@ -43,17 +43,16 @@ defmodule MonobolyDeal.Game.ServerTest do
       game_name = NameGenerator.generate()
       {:ok, _pid} = Server.start_link(game_name, "player1")
 
-      {:ok, game} = Server.join(game_name, %{name: "player2"})
+      {:ok, game} = Server.join(game_name, "player2")
 
       assert [%{name: "player1"}, %{name: "player2"}] = game.players
     end
 
     test "does nothing when player has already been added" do
       game_name = NameGenerator.generate()
-      player1 = Player.new("player1")
       {:ok, _pid} = Server.start_link(game_name, "player1")
 
-      {:ok, game_state} = Server.join(game_name, player1)
+      {:ok, game_state} = Server.join(game_name, "player1")
 
       assert [%{name: "player1"}] = game_state.players
     end

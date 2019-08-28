@@ -3,6 +3,7 @@ defmodule MonobolyDeal.Deck.Property do
 
   defstruct [:id, :name, :color, :value, :rent_values, :image_url]
 
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def new(color) do
     case color do
       :blue ->
