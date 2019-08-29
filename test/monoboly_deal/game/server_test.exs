@@ -44,27 +44,27 @@ defmodule MonobolyDeal.Game.ServerTest do
 
       {:ok, game} = Server.join(game_name, "player2")
 
-      assert [%{name: "player1"}, %{name: "player2"}] = game.players
+      assert %{"player1" => %{name: "player1"}, "player2" => %{name: "player2"}} = game.players
     end
 
     test "does nothing when player has already been added" do
       game_name = NameGenerator.generate()
       {:ok, _pid} = Server.start_link(game_name, "player1")
 
-      {:ok, game_state} = Server.join(game_name, "player1")
+      {:ok, game} = Server.join(game_name, "player1")
 
-      assert [%{name: "player1"}] = game_state.players
+      assert %{"player1" => %{name: "player1"}} = game.players
     end
 
     test "returns an error when the game has already started" do
       game_name = NameGenerator.generate()
       {:ok, _pid} = Server.start_link(game_name, "player1")
-      {:ok, _} = Server.deal_hand(game_name)
+      {:ok, _} = Server.deal(game_name)
 
       {:error, error} = Server.join(game_name, "player2")
 
-      game_state = Server.game_state(game_name)
-      assert [%{name: "player1"}] = game_state.players
+      game = Server.game(game_name)
+      assert %{"player1" => %{name: "player1"}} = game.players
       assert error == %{error: :game_started, message: "Oops! This game has already started."}
     end
   end
@@ -89,12 +89,12 @@ defmodule MonobolyDeal.Game.ServerTest do
       game_name = NameGenerator.generate()
       {:ok, _pid} = Server.start_link(game_name, "player1")
 
-      Server.deal_hand(game_name)
+      Server.deal(game_name)
 
-      game_state = Server.game_state(game_name)
+      game = Server.game(game_name)
 
       Enum.each(
-        game_state.players,
+        Map.values(game.players),
         fn player ->
           hand = Server.get_hand(game_name, player.name)
           assert Enum.count(hand) == 5
@@ -103,26 +103,11 @@ defmodule MonobolyDeal.Game.ServerTest do
     end
   end
 
-  describe "game_state" do
-    test "returns the game state for all players" do
-      game_name = NameGenerator.generate()
-      {:ok, _pid} = Server.start_link(game_name, "player1")
-      Server.deal_hand(game_name)
-
-      game_state = Server.game_state(game_name)
-
-      assert %{
-               game_name: game_name,
-               players: [%{name: "player1"}]
-             } = game_state
-    end
-  end
-
   describe "player_state" do
     test "returns the player state for the specified player" do
       game_name = NameGenerator.generate()
       {:ok, _pid} = Server.start_link(game_name, "player1")
-      Server.deal_hand(game_name)
+      Server.deal(game_name)
 
       player_state = Server.player_state(game_name, "player1")
 
@@ -135,7 +120,7 @@ defmodule MonobolyDeal.Game.ServerTest do
     test "returns the hand of the specified player" do
       game_name = NameGenerator.generate()
       {:ok, _pid} = Server.start_link(game_name, "player1")
-      Server.deal_hand(game_name)
+      Server.deal(game_name)
 
       hand = Server.get_hand(game_name, "player1")
 
@@ -147,7 +132,7 @@ defmodule MonobolyDeal.Game.ServerTest do
     test "sets the chosen card in the current turn" do
       game_name = NameGenerator.generate()
       {:ok, _pid} = Server.start_link(game_name, "player1")
-      Server.deal_hand(game_name)
+      Server.deal(game_name)
       Server.draw_cards(game_name, "player1")
       [card | _] = Server.get_hand(game_name, "player1")
 
@@ -161,7 +146,7 @@ defmodule MonobolyDeal.Game.ServerTest do
     test "places the chosen card in the player's bank" do
       game_name = NameGenerator.generate()
       {:ok, _pid} = Server.start_link(game_name, "player1")
-      Server.deal_hand(game_name)
+      Server.deal(game_name)
       Server.draw_cards(game_name, "player1")
       [card | _] = Server.get_hand(game_name, "player1")
 

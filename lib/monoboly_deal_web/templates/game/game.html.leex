@@ -18,7 +18,7 @@
   <section class="players-container">
     <h3>Players</h3>
     <ul>
-      <%= for player <- @game_state.players do %>
+      <%= for player <- Map.values(@game_state.players) do %>
         <li><%= player.name %></li>
       <% end %>
     </ul>

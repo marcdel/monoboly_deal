@@ -19,7 +19,7 @@ defmodule MonobolyDealWeb.InProgressGameView do
           |> assign(info_message: "You've joined the game!")
           |> assign(game_name: game_name)
           |> assign(current_player: current_player)
-          |> assign(game_state: Server.game_state(game_name))
+          |> assign(game_state: Server.game(game_name))
           |> assign(player_state: Server.player_state(game_name, current_player.name))
 
         {:ok, socket}
@@ -30,8 +30,7 @@ defmodule MonobolyDealWeb.InProgressGameView do
   end
 
   def handle_event("deal-hand", _value, socket) do
-    %{game_name: game_name, current_player: current_player} = socket.assigns
-    Server.deal_hand(game_name)
+    Server.deal(socket.assigns.game_name)
     {:noreply, update_state(socket)}
   end
 
@@ -77,7 +76,7 @@ defmodule MonobolyDealWeb.InProgressGameView do
   defp update_state(socket) do
     %{game_name: game_name, current_player: current_player} = socket.assigns
     player_state = Server.player_state(game_name, current_player.name)
-    game_state = Server.game_state(game_name)
+    game_state = Server.game(game_name)
 
     assign(socket, player_state: player_state, game_state: game_state)
   end

@@ -29,7 +29,7 @@ defmodule MonobolyDealWeb.InProgressGameViewTest do
     end
 
     test "redirects if not joined and game has already started", %{game_name: game_name} do
-      Server.deal_hand(game_name)
+      Server.deal(game_name)
       player2_session = %{game_name: game_name, current_player: %{name: "player2"}}
 
       {:error, %{redirect: "/games/new"}} =

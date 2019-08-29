@@ -10,7 +10,7 @@ defmodule MonobolyDeal.GameTest do
       game_name = NameGenerator.generate()
       game = Game.new(game_name, "player1")
       assert game.name == game_name
-      assert game.players == [Game.find_player(game, "player1")]
+      assert %{"player1" => %{name: "player1"}} = game.players
     end
 
     test "starts with an empty discard pile and a shuffled deck" do
@@ -36,14 +36,18 @@ defmodule MonobolyDeal.GameTest do
 
     test "adds the player to the game", %{game: game} do
       {:ok, game} = Game.join(game, "player2")
-      assert [%{name: "player1"}, %{name: "player2"}] = game.players
+
+      assert %{
+               "player1" => %{name: "player1"},
+               "player2" => %{name: "player2"}
+             } = game.players
     end
 
     test "does not re-add a player that has already joined", %{game: game} do
       {:ok, game} = Game.join(game, "player1")
 
-      assert Enum.count(game.players) == 1
-      assert [%{name: "player1"}] = game.players
+      assert game.players |> Map.values() |> Enum.count() == 1
+      assert %{"player1" => %{name: "player1"}} = game.players
     end
 
     test "player can rejoin a game that has already started", %{game: game} do
@@ -51,8 +55,8 @@ defmodule MonobolyDeal.GameTest do
 
       {:ok, game} = Game.join(game, "player1")
 
-      assert Enum.count(game.players) == 1
-      assert [%{name: "player1"}] = game.players
+      assert game.players |> Map.values() |> Enum.count() == 1
+      assert %{"player1" => %{name: "player1"}} = game.players
     end
 
     test "returns an error when new player joins an in progress game", %{game: game} do
@@ -62,9 +66,8 @@ defmodule MonobolyDeal.GameTest do
 
       assert error == %{error: :game_started, message: "Oops! This game has already started."}
 
-      game_state = Game.game_state(game)
-      assert Enum.count(game_state.players) == 1
-      assert [%{name: "player1"}] = game_state.players
+      assert game.players |> Map.values() |> Enum.count() == 1
+      assert %{"player1" => %{name: "player1"}} = game.players
     end
   end
 
@@ -80,9 +83,7 @@ defmodule MonobolyDeal.GameTest do
 
     test "the game is not started until a hand is dealt", %{game: game} do
       assert game.started == false
-
       game = Game.deal(game)
-
       assert game.started == true
     end
 
@@ -100,7 +101,7 @@ defmodule MonobolyDeal.GameTest do
 
     test "chooses a player to have the first turn", %{game: game} do
       game = Game.deal(game)
-      assert Game.game_state(game).current_turn != nil
+      assert game.current_turn != nil
     end
   end
 
@@ -119,7 +120,7 @@ defmodule MonobolyDeal.GameTest do
       %{name: name} = game.current_turn.player
       game = Game.draw_cards(game, name)
       assert Enum.count(Game.player_state(game, name).hand) == 7
-      assert Enum.count(Game.game_state(game).current_turn.drawn_cards) == 2
+      assert Enum.count(game.current_turn.drawn_cards) == 2
     end
 
     test "does nothing when not your turn", %{game: game} do
@@ -137,7 +138,7 @@ defmodule MonobolyDeal.GameTest do
       game = Game.draw_cards(game, Game.whose_turn(game))
 
       assert Enum.count(Game.player_state(game, Game.whose_turn(game)).hand) == 7
-      assert Enum.count(Game.game_state(game).current_turn.drawn_cards) == 2
+      assert Enum.count(game.current_turn.drawn_cards) == 2
     end
   end
 
@@ -207,20 +208,6 @@ defmodule MonobolyDeal.GameTest do
       assert player_state.bank_total == card.value
       assert Game.find_card(game, "player1", card.id) == nil
       assert game.current_turn.chosen_card == nil
-    end
-  end
-
-  describe "getting the game state" do
-    test "returns the game state for all players" do
-      game_state =
-        create_started_game()
-        |> Game.game_state()
-
-      assert %{
-               game_name: game_name,
-               players: [%{name: "player1"}, %{name: "player2"}],
-               started: true
-             } = game_state
     end
   end
 

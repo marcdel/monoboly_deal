@@ -1,8 +1,6 @@
 defmodule MonobolyDeal.Game.Server do
   use GenServer
-
   alias MonobolyDeal.Game
-  alias MonobolyDealWeb.Endpoint
 
   @timeout :timer.hours(2)
 
@@ -18,8 +16,8 @@ defmodule MonobolyDeal.Game.Server do
     GenServer.call(via_tuple(game_name), {:playing?, player_name})
   end
 
-  def deal_hand(game_name) do
-    GenServer.call(via_tuple(game_name), :deal_hand)
+  def deal(game_name) do
+    GenServer.call(via_tuple(game_name), :deal)
   end
 
   def draw_cards(game_name, player_name) do
@@ -34,8 +32,8 @@ defmodule MonobolyDeal.Game.Server do
     GenServer.call(via_tuple(game_name), {:place_card_bank, player_name})
   end
 
-  def game_state(game_name) do
-    GenServer.call(via_tuple(game_name), :game_state)
+  def game(game_name) do
+    GenServer.call(via_tuple(game_name), :game)
   end
 
   def player_state(game_name, player_name) do
@@ -71,7 +69,7 @@ defmodule MonobolyDeal.Game.Server do
     {:ok, game, @timeout}
   end
 
-  def handle_call(:deal_hand, _from, game) do
+  def handle_call(:deal, _from, game) do
     updated_game = Game.deal(game)
     {:reply, {:ok, updated_game}, updated_game, @timeout}
   end
@@ -104,7 +102,7 @@ defmodule MonobolyDeal.Game.Server do
   def handle_call({:join, player_name}, _from, game) do
     case Game.join(game, player_name) do
       {:ok, updated_game} ->
-        {:reply, {:ok, Game.game_state(updated_game)}, updated_game, @timeout}
+        {:reply, {:ok, updated_game}, updated_game, @timeout}
 
       {:error, error} ->
         {:reply, {:error, error}, game, @timeout}
@@ -118,8 +116,8 @@ defmodule MonobolyDeal.Game.Server do
     end
   end
 
-  def handle_call(:game_state, _from, game) do
-    {:reply, Game.game_state(game), game, @timeout}
+  def handle_call(:game, _from, game) do
+    {:reply, game, game, @timeout}
   end
 
   def handle_call({:player_state, player_name}, _from, game) do
